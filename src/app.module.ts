@@ -6,9 +6,9 @@ import { ConfigModule } from '@nestjs/config';
   imports: [
     ConfigModule.forRoot({
       envFilePath: '.env', // 파일의 경로 설정
-      isGlobal: true, 
-    }),    
-    AuthModule
+      isGlobal: true,
+    }),
+    AuthModule,
   ],
   controllers: [],
   providers: [],
