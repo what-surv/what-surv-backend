@@ -10,12 +10,12 @@ export class AuthController {
   // 구글 로그인
   @Get('/login/google')
   @UseGuards(AuthGuard('google'))
-  async loginGoogle(@Req() req: Request, @Res() res: Response) {}
+  async loginGoogle(@Req() _req: Request, @Res() _res: Response) {}
 
   // 구글 로그인 redirect
   @Get('/callback/google')
   @UseGuards(AuthGuard('google'))
-  async callbackGoogle(@Req() req: Request, @Res() res: Response) {
+  async callbackGoogle(@Req() req: Request, @Res() _res: Response) {
     const user = req.user;
 
     console.log(user);
