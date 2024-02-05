@@ -6,9 +6,9 @@ export class GoogleStrategy extends PassportStrategy(Strategy, "google") {
 
         super({
             // 환경 변수로 빼야함
-            clientID: process.env.CLIENT_ID,
-            clientSecret: process.env.CLIENT_SECRET,
-            callbackURL: process.env.CALLBACK_URL,
+            clientID: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            callbackURL: process.env.GOOGLE_CALLBACK_URL,
             scope: ["email", "profile"],
         });
     }
