@@ -5,6 +5,6 @@ import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, GoogleStrategy]
+  providers: [AuthService, GoogleStrategy],
 })
 export class AuthModule {}
