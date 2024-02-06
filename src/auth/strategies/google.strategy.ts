@@ -15,11 +15,22 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   validate(accessToken: string, refreshToken: string, profile: Profile) {
     const { id, name, emails } = profile;
 
+    // TODO: change to your own DTO
+
+    let email = undefined;
+
+    if (emails != null && emails.length > 0) {
+      const primaryEmail = emails[0];
+      if (primaryEmail.verified) {
+        email = primaryEmail.value;
+      }
+    }
+
     return {
       provider: 'google',
       providerId: id,
-      name: name.givenName,
-      email: emails[0].value,
+      name: name?.givenName,
+      email,
     };
   }
 }
