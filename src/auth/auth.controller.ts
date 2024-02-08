@@ -19,8 +19,8 @@ import {
 } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { Public, isNil } from 'src/common/utils';
-import { CustomJwtAuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
+import { CustomJwtGuard } from './custom-jwt.guard';
 
 export class SignInDto {
   @ApiProperty({ example: 'john' })
@@ -67,7 +67,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Profile' })
-  @UseGuards(CustomJwtAuthGuard)
+  @UseGuards(CustomJwtGuard)
   @Get('profile')
   @HttpCode(HttpStatus.OK)
   getProfile(@Req() req: Request) {

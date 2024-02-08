@@ -3,20 +3,20 @@ import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host';
 import { JwtService } from '@nestjs/jwt';
-import { CustomJwtAuthGuard } from './auth.guard';
+import { CustomJwtGuard } from './custom-jwt.guard';
 
 describe('AuthGuard', () => {
   let jwtService: JwtService;
   let reflector: Reflector;
   let configService: ConfigService;
-  let customJwtAuthGuard: CustomJwtAuthGuard;
+  let customJwtAuthGuard: CustomJwtGuard;
   let executionContext: ExecutionContext;
 
   beforeEach(() => {
     reflector = new Reflector();
     executionContext = new ExecutionContextHost([], undefined, undefined);
 
-    customJwtAuthGuard = new CustomJwtAuthGuard(
+    customJwtAuthGuard = new CustomJwtGuard(
       jwtService,
       reflector,
       configService,
@@ -24,7 +24,7 @@ describe('AuthGuard', () => {
   });
 
   it('should be defined', () => {
-    expect(CustomJwtAuthGuard).toBeDefined();
+    expect(CustomJwtGuard).toBeDefined();
   });
 
   it('basic test', async () => {
