@@ -18,7 +18,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-import { isNil } from 'src/common/utils';
+import { Public, isNil } from 'src/common/utils';
 import { CustomJwtAuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 
@@ -48,6 +48,7 @@ export class AuthController {
     console.log(user);
   }
 
+  @Public()
   @ApiOperation({ summary: 'Sign In' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Sign In Success' })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
