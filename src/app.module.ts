@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
-import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
+import { validationPipeProvider } from './common/validation-pipe';
 
 @Module({
   imports: [
@@ -11,6 +12,6 @@ import { ConfigModule } from '@nestjs/config';
     AuthModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [validationPipeProvider],
 })
 export class AppModule {}
