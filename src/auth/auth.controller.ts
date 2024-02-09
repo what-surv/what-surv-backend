@@ -42,4 +42,65 @@ export class AuthController {
     // 리다이렉트
     // res.redirect('/frontURL');
   }
+
+  // 네이버 로그인
+  @Get('/login/naver')
+  @UseGuards(AuthGuard('naver'))
+  async loginNaver(@Req() _req: Request, @Res() _res: Response) {}
+
+  // 네이버 로그인 redirect
+  @Get('/callback/naver')
+  @UseGuards(AuthGuard('naver'))
+  async callbackNaver(@Req() req: Request, @Res() _res: Response) {
+    // Todo: 에러처리 및 로직 수정
+    if (req.user) {
+      const { provider, providerId, email } = req.user as UserCreateDto;
+
+      // 조회
+      const user = await this.userService.findUserByProviderId(providerId);
+
+      if (user) {
+        console.log('USER EXISTS');
+        return;
+      }
+
+      const newUser = new UserCreateDto(provider, providerId, email);
+      // 저장
+      this.userService.createUser(newUser);
+      console.log('USER REGISTERED!');
+    }
+
+    // 리다이렉트
+    // res.redirect('/frontURL');
+  }
+
+  // 카카오 로그인
+  @Get('/login/kakao')
+  @UseGuards(AuthGuard('kakao'))
+  async loginKakao(@Req() _req: Request, @Res() _res: Response) {}
+
+  // 카카오 로그인 redirect
+  @Get('/callback/kakao')
+  @UseGuards(AuthGuard('kakao'))
+  async callbackKakao(@Req() req: Request, @Res() _res: Response) {
+    if (req.user) {
+      const { provider, providerId, email } = req.user as UserCreateDto;
+
+      // 조회
+      const user = await this.userService.findUserByProviderId(providerId);
+
+      if (user) {
+        console.log('USER EXISTS');
+        return;
+      }
+
+      const newUser = new UserCreateDto(provider, providerId, email);
+      // 저장
+      this.userService.createUser(newUser);
+      console.log('USER REGISTERED!');
+    }
+
+    // 리다이렉트
+    // res.redirect('/frontURL');
+  }
 }
