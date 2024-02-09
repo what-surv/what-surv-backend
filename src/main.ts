@@ -1,14 +1,16 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { SwaggerModule } from '@nestjs/swagger';
-import { BaseAPIDocument } from './config/swagger.documents';
 import * as dotenv from 'dotenv';
+import { AppModule } from './app.module';
+import { morganSetup } from './common/morgan/morgan.setup';
+import { BaseAPIDocument } from './config/swagger.documents';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   dotenv.config();
 
-  // Swagger 설정
+  morganSetup(app);
+
   const config = new BaseAPIDocument().initializeOptions();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
