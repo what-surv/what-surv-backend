@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { Role } from 'src/auth/role/role';
 
 export type User = {
   userId: number;
   username: string;
   password: string;
+  roles: Role[];
 };
 
 @Injectable()
@@ -11,13 +13,15 @@ export class UserService {
   private readonly users = [
     {
       userId: 1,
-      username: 'john',
-      password: 'changeme',
+      username: 'user',
+      password: 'userpw',
+      roles: [Role.User],
     },
     {
       userId: 2,
-      username: 'maria',
-      password: 'guess',
+      username: 'admin',
+      password: 'adminpw',
+      roles: [Role.User, Role.Admin],
     },
   ];
 

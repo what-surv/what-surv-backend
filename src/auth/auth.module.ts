@@ -6,6 +6,7 @@ import { UserModule } from 'src/user/user.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { CustomJwtGuard } from './custom-jwt.guard';
+import { RoleGuard } from './role.guard';
 import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
@@ -26,6 +27,7 @@ import { GoogleStrategy } from './strategies/google.strategy';
     AuthService,
     GoogleStrategy,
     { provide: APP_GUARD, useClass: CustomJwtGuard },
+    { provide: APP_GUARD, useClass: RoleGuard },
   ],
   exports: [AuthService],
 })
