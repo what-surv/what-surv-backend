@@ -2,7 +2,7 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
 import { AuthModule } from './auth/auth.module';
-import { RoleExampleModule } from './role-example/role-example..module';
+import { RoleExampleModule } from './role-example/role-example.module';
 import { UserModule } from './user/user.module';
 
 @Module({
