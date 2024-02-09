@@ -8,7 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { IS_PUBLIC_KEY } from 'src/common/utils';
+import { IS_PUBLIC_KEY, isNil } from 'src/common/utils';
 
 @Injectable()
 export class CustomJwtGuard implements CanActivate {
@@ -29,19 +29,24 @@ export class CustomJwtGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
 
-    if (!token) {
+    const token =
+      this.extractTokenFromHeader(request) ?? request.cookies?.Authentication;
+
+    if (isNil(token)) {
       throw new UnauthorizedException();
     }
 
     try {
-      const payload = this.jwtService.verifyAsync(token, {
+      const payload = await this.jwtService.verifyAsync(token, {
         secret: this.configService.get<string>('JWT_SECRET'),
       });
 
       request['user'] = payload;
-    } catch {
+    } catch (e) {
+      console.error('Token is invalid!');
+      console.error(e);
+
       throw new UnauthorizedException();
     }
     return true;

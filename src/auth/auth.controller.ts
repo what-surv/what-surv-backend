@@ -11,23 +11,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import {
-  ApiOperation,
-  ApiProperty,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { Public, isNil } from 'src/common/utils';
 import { AuthService } from './auth.service';
 import { CustomJwtGuard } from './custom-jwt.guard';
-
-export class SignInDto {
-  @ApiProperty({ example: 'john' })
-  username?: string;
-  @ApiProperty({ example: 'changeme' })
-  password?: string;
-}
+import { SignInDto, signInDtoBodyOptions } from './dto/sign-in.dto';
 
 @ApiTags('Authorization')
 @Controller('auth')
@@ -49,21 +38,23 @@ export class AuthController {
   }
 
   @Public()
-  @ApiOperation({ summary: 'Sign In' })
+  @ApiOperation({ summary: 'Mock local sign in' })
+  @ApiBody(signInDtoBodyOptions)
   @ApiResponse({ status: HttpStatus.OK, description: 'Sign In Success' })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async signIn(@Body() signInDto: SignInDto) {
+  async signIn(@Body() signInDto: SignInDto, @Res() res: Response) {
     const { username, password } = signInDto;
-
-    console.log(username, password);
 
     if (isNil(username) || isNil(password)) {
       throw new UnauthorizedException();
     }
 
-    return this.authService.signIn(username, password);
+    const { access_token } = await this.authService.signIn(username, password);
+
+    res.cookie('Authentication', access_token, { httpOnly: true });
+    res.send({ access_token });
   }
 
   @ApiOperation({ summary: 'Profile' })
