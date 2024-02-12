@@ -30,13 +30,15 @@ export class AuthController {
 
       if (user) {
         console.log('USER EXISTS');
-        return;
+        return user;
       }
 
       const newUser = new UserCreateDto(provider, providerId, email);
+
       // 저장
-      this.userService.createUser(newUser);
       console.log('USER REGISTERED!');
+      this.userService.createUser(newUser);
+      return newUser;
     }
 
     // 리다이렉트
@@ -61,13 +63,15 @@ export class AuthController {
 
       if (user) {
         console.log('USER EXISTS');
-        return;
+        return user;
       }
 
       const newUser = new UserCreateDto(provider, providerId, email);
+
       // 저장
-      this.userService.createUser(newUser);
       console.log('USER REGISTERED!');
+      this.userService.createUser(newUser);
+      return newUser;
     }
 
     // 리다이렉트
@@ -91,13 +95,15 @@ export class AuthController {
 
       if (user) {
         console.log('USER EXISTS');
-        return;
+        return user;
       }
 
       const newUser = new UserCreateDto(provider, providerId, email);
+
       // 저장
-      this.userService.createUser(newUser);
       console.log('USER REGISTERED!');
+      this.userService.createUser(newUser);
+      return newUser;
     }
 
     // 리다이렉트

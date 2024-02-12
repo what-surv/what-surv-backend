@@ -28,7 +28,9 @@ export class UserService {
   }
 
   async findUserByProviderId(providerId: string): Promise<User | null> {
-    return this.userRepository.findOne({ where: { providerId: providerId } });
+    return this.userRepository.findOne({
+      where: { providerId: providerId },
+    });
   }
 
   async createUser(userCreateDto: UserCreateDto): Promise<User> {
