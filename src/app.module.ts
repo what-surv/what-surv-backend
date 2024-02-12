@@ -1,8 +1,12 @@
-import { Module } from '@nestjs/common';
-import { AuthModule } from './auth/auth.module';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeormConfig } from './config/typeorm.config';
+import * as cookieParser from 'cookie-parser';
+import { AuthModule } from './auth/auth.module';
+import { validationPipeProvider } from './common/validation-pipe';
+import { RoleExampleModule } from './role-example/role-example.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -14,8 +18,14 @@ import { TypeormConfig } from './config/typeorm.config';
       isGlobal: true,
     }),
     AuthModule,
+    UserModule,
+    RoleExampleModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [validationPipeProvider],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(cookieParser()).forRoutes('*');
+  }
+}

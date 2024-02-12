@@ -11,7 +11,8 @@
     "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "dev": "nest start --watch",
-    "debug": "nest start --debug --watch",
+    "debug": "nest start --debug",
+    "debug:watch": "nest start --debug --watch",
     "prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest --passWithNoTests",
@@ -24,14 +25,20 @@
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.1.1",
     "@nestjs/core": "^10.0.0",
+    "@nestjs/jwt": "^10.2.0",
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/swagger": "^7.2.0",
     "@nestjs/typeorm": "^10.0.2",
+    "@types/passport-kakao": "^1.0.3",
+    "@types/cookie-parser": "^1.4.6",
     "@types/dotenv": "^8.2.0",
     "@types/passport-google-oauth20": "^2.0.14",
-    "@types/passport-kakao": "^1.0.3",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "cookie-parser": "^1.4.6",
     "dotenv": "^16.4.1",
+    "morgan": "^1.10.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-kakao": "^1.0.1",
     "passport-naver": "^1.0.6",
@@ -44,9 +51,10 @@
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
-    "@nestjs/testing": "^10.0.0",
+    "@nestjs/testing": "^10.3.2",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.2",
+    "@types/morgan": "^1.9.9",
     "@types/node": "^20.3.1",
     "@types/passport": "^1.0.16",
     "@types/passport-naver": "^1.0.4",
@@ -76,6 +84,10 @@
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "moduleNameMapper": {
+      "src/(.*)$": "<rootDir>/$1",
+      "test/(.*)$": "<rootDir>/$1"
     },
     "collectCoverageFrom": [
       "**/*.(t|j)s"
