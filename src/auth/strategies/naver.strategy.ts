@@ -11,7 +11,7 @@ export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
     });
   }
 
-  validate(accessToken: string, refreshToken: string, profile: Profile) {
+  validate(_accessToken: string, _refreshToken: string, profile: Profile) {
     const user: UserCreateDto = new UserCreateDto(
       'naver',
       profile.id,
