@@ -5,9 +5,11 @@ import { AppModule } from './app.module';
 import { morganSetup } from './common/morgan/morgan.setup';
 import { BaseAPIDocument } from './config/swagger.documents';
 
+Error.stackTraceLimit = Infinity;
+dotenv.config();
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  dotenv.config();
 
   morganSetup(app);
 
