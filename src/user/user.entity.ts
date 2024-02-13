@@ -1,3 +1,4 @@
+import { Role } from 'src/auth/role/role';
 import {
   Column,
   CreateDateColumn,
@@ -18,6 +19,9 @@ export class User {
 
   @Column()
   providerId!: string;
+
+  @Column({ default: Role.User })
+  role!: Role;
 
   @CreateDateColumn({ type: 'timestamp without time zone' })
   createdDate?: Date;

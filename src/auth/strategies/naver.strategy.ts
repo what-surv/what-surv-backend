@@ -1,6 +1,6 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-naver';
-import { UserCreateDto } from '../user.dto';
+import { AuthLoginDto } from '../auth.dto';
 
 export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
   constructor() {
@@ -12,11 +12,9 @@ export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
   }
 
   validate(_accessToken: string, _refreshToken: string, profile: Profile) {
-    const user: UserCreateDto = new UserCreateDto(
-      'naver',
-      profile.id,
-      profile._json.email!,
-    );
+    const email = profile._json.email;
+
+    const user: AuthLoginDto = new AuthLoginDto('naver', profile.id, email!);
     return user;
   }
 }

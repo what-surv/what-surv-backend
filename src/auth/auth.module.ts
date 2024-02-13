@@ -8,11 +8,11 @@ import { AuthService } from './auth.service';
 import { CustomJwtGuard } from './custom-jwt.guard';
 import { RoleGuard } from './role.guard';
 import { GoogleStrategy } from './strategies/google.strategy';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserService } from './user.service';
-import { User } from './user.entity';
 import { KakaoStrategy } from './strategies/kakao.strategy';
 import { NaverStrategy } from './strategies/naver.strategy';
+import { UserService } from 'src/user/user.service';
+import { User } from 'src/user/user.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -24,7 +24,7 @@ import { NaverStrategy } from './strategies/naver.strategy';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '60s' },
+        signOptions: { expiresIn: '600s' },
       }),
     }),
   ],

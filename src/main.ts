@@ -8,7 +8,7 @@ Error.stackTraceLimit = Infinity;
 dotenv.config();
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: true });
 
   // Swagger 설정
   const config = new BaseAPIDocument().initializeOptions();
