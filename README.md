@@ -8,7 +8,6 @@
 
 https://api.not-yet-implemented.com
 
-
 ## 기술적 도전
 
 ### arstarst
@@ -22,7 +21,6 @@ arstarstarstarstarstarst!!!
 ## 백엔드 팀원 소개 & 맡은 역할
 
 ### 김대현 (https://github.com/vimkim)
-
 
 arsnteiaorsnetiaorsnteaoirst
 
@@ -40,9 +38,7 @@ arsnteiaorsnetiaorsnteaoirst
 - Typescript
 - PostgreSQL
 
-
 ## How to run
-
 
 ```bash
 npm install

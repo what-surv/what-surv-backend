@@ -8,9 +8,15 @@ import { AuthService } from './auth.service';
 import { CustomJwtGuard } from './custom-jwt.guard';
 import { RoleGuard } from './role.guard';
 import { GoogleStrategy } from './strategies/google.strategy';
+import { KakaoStrategy } from './strategies/kakao.strategy';
+import { NaverStrategy } from './strategies/naver.strategy';
+import { UserService } from 'src/user/user.service';
+import { User } from 'src/user/user.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([User]),
     UserModule,
     JwtModule.registerAsync({
       global: true,
@@ -18,14 +24,17 @@ import { GoogleStrategy } from './strategies/google.strategy';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '60s' },
+        signOptions: { expiresIn: '600s' },
       }),
     }),
   ],
   controllers: [AuthController],
   providers: [
     AuthService,
+    UserService,
     GoogleStrategy,
+    KakaoStrategy,
+    NaverStrategy,
     { provide: APP_GUARD, useClass: CustomJwtGuard },
     { provide: APP_GUARD, useClass: RoleGuard },
   ],

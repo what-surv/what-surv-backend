@@ -1,5 +1,7 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-google-oauth20';
+import { AuthLoginDto } from '../auth.dto';
+import { isNil } from 'src/common/utils';
 
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor() {
@@ -12,10 +14,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     });
   }
 
-  validate(accessToken: string, refreshToken: string, profile: Profile) {
-    const { id, name, emails } = profile;
-
-    // TODO: change to your own DTO
+  validate(_accessToken: string, _refreshToken: string, profile: Profile) {
+    const { id, emails } = profile;
 
     let email = undefined;
 
@@ -26,11 +26,11 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       }
     }
 
-    return {
-      provider: 'google',
-      providerId: id,
-      name: name?.givenName,
-      email,
-    };
+    if (isNil(email)) {
+      throw new Error('email undefined');
+    }
+
+    const user: AuthLoginDto = new AuthLoginDto('google', id, email);
+    return user;
   }
 }

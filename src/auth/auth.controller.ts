@@ -11,6 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { AuthSignUpDto } from './auth.dto';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { Public, isNil } from 'src/common/utils';
@@ -23,18 +24,46 @@ import { SignInDto, signInDtoBodyOptions } from './dto/sign-in.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  // 구글 로그인
+  @Public()
+  @Post('/sign-up')
+  async signUp(@Req() req: Request, @Body() authSignUpDto: AuthSignUpDto) {
+    this.authService.signUp(req, authSignUpDto);
+  }
+
+  @Public()
   @Get('/login/google')
   @UseGuards(AuthGuard('google'))
   async loginGoogle(@Req() _req: Request, @Res() _res: Response) {}
 
-  // 구글 로그인 redirect
+  @Public()
   @Get('/callback/google')
   @UseGuards(AuthGuard('google'))
-  async callbackGoogle(@Req() req: Request, @Res() _res: Response) {
-    const user = req.user;
+  async callbackGoogle(@Req() req: Request, @Res() res: Response) {
+    this.authService.setTokenToCookie(req, res);
+  }
 
-    console.log(user);
+  @Public()
+  @Get('/login/naver')
+  @UseGuards(AuthGuard('naver'))
+  async loginNaver(@Req() _req: Request, @Res() _res: Response) {}
+
+  @Public()
+  @Get('/callback/naver')
+  @UseGuards(AuthGuard('naver'))
+  async callbackNaver(@Req() req: Request, @Res() res: Response) {
+    this.authService.setTokenToCookie(req, res);
+  }
+
+  @Public()
+  @Get('/login/kakao')
+  @UseGuards(AuthGuard('kakao'))
+  async loginKakao(@Req() _req: Request, @Res() _res: Response) {}
+
+  @Public()
+  @Get('/callback/kakao')
+  @UseGuards(AuthGuard('kakao'))
+  async callbackKakao(@Req() req: Request, @Res() res: Response) {
+    this.authService.setTokenToCookie(req, res);
   }
 
   @Public()
@@ -51,10 +80,10 @@ export class AuthController {
       throw new UnauthorizedException();
     }
 
-    const { access_token } = await this.authService.signIn(username, password);
+    const { accessToken } = await this.authService.signIn(username, password);
 
-    res.cookie('Authentication', access_token, { httpOnly: true });
-    res.send({ access_token });
+    res.cookie('Authentication', accessToken, { httpOnly: true });
+    res.send({ accessToken });
   }
 
   @ApiOperation({ summary: 'Profile' })
