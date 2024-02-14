@@ -121,7 +121,7 @@ export class AuthService {
           httpOnly: true,
           secure: false,
         });
-        res.redirect(`/${clientUrl}/success`);
+        res.redirect(`${clientUrl}/login/success`);
         return;
       }
 
@@ -132,7 +132,7 @@ export class AuthService {
         httpOnly: true,
         secure: false,
       });
-      res.redirect(`/${clientUrl}/fail`);
+      res.redirect(`${clientUrl}/login/new-user`);
       return;
     }
     return;

@@ -18,19 +18,11 @@ import { Public, isNil } from 'src/common/utils';
 import { AuthService } from './auth.service';
 import { CustomJwtGuard } from './custom-jwt.guard';
 import { SignInDto, signInDtoBodyOptions } from './dto/sign-in.dto';
-import { UserService } from 'src/user/user.service';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
 
 @ApiTags('Authorization')
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly userService: UserService,
-    private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Public()
   @Post('/sign-up')
