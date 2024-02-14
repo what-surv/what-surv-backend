@@ -11,10 +11,10 @@ import { UserModule } from './user/user.module';
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
-      useClass: TypeormConfig, // TODO: typeorm 설정한 클래스
+      useClass: TypeormConfig,
     }),
     ConfigModule.forRoot({
-      envFilePath: '.env', // 파일의 경로 설정
+      envFilePath: '.env',
       isGlobal: true,
     }),
     AuthModule,

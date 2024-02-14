@@ -15,13 +15,13 @@ export class User {
   email!: string;
 
   @Column()
-  platform!: string;
+  provider!: string;
 
   @Column()
   providerId!: string;
 
   @Column({ default: Role.User })
-  role!: Role;
+  roles!: Role;
 
   @CreateDateColumn({ type: 'timestamp without time zone' })
   createdDate?: Date;
@@ -36,5 +36,5 @@ export class User {
   job?: string;
 
   @Column({ nullable: true })
-  birthdate?: Date;
+  birthDate?: Date;
 }

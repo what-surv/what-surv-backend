@@ -11,7 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { AuthLoginDto, AuthSignUpDto } from './auth.dto';
+import { AuthSignUpDto } from './auth.dto';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { Public, isNil } from 'src/common/utils';
@@ -19,7 +19,7 @@ import { AuthService } from './auth.service';
 import { CustomJwtGuard } from './custom-jwt.guard';
 import { SignInDto, signInDtoBodyOptions } from './dto/sign-in.dto';
 import { UserService } from 'src/user/user.service';
-import { JwtService, TokenExpiredError } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 
 @ApiTags('Authorization')
@@ -35,32 +35,7 @@ export class AuthController {
   @Public()
   @Post('/sign-up')
   async signUp(@Req() req: Request, @Body() authSignUpDto: AuthSignUpDto) {
-    const [_type, token] = req?.headers?.authorization?.split(' ') ?? [];
-
-    if (isNil(token)) {
-      throw new UnauthorizedException('need token');
-    }
-
-    try {
-      const payload: AuthLoginDto = await this.jwtService.verifyAsync(token, {
-        secret: this.configService.get<string>('JWT_SECRET'),
-      });
-
-      if (
-        !isNil(await this.userService.findUserByProviderId(payload.providerId))
-      ) {
-        throw new Error('User Already Registered');
-      }
-
-      const user = await this.authService.makeUser(payload, authSignUpDto);
-
-      this.authService.signUp(user);
-    } catch (e) {
-      if (e instanceof TokenExpiredError) {
-        throw new UnauthorizedException('jwt expired');
-      }
-      console.error(e);
-    }
+    this.authService.signUp(req, authSignUpDto);
   }
 
   @Public()
@@ -72,29 +47,7 @@ export class AuthController {
   @Get('/callback/google')
   @UseGuards(AuthGuard('google'))
   async callbackGoogle(@Req() req: Request, @Res() res: Response) {
-    if (req.user) {
-      const { provider, providerId, email } = req.user as AuthLoginDto;
-
-      const user = await this.userService.findUserByProviderId(providerId);
-
-      if (user) {
-        const accessToken = this.authService.signIn2(providerId);
-        res.cookie('Authentication', (await accessToken).accessToken, {
-          httpOnly: true,
-          secure: false,
-        });
-        res.redirect('/to-front/success');
-        return;
-      }
-
-      const tmpToken = this.authService.tempSignUp(provider, providerId, email);
-      res.cookie('info', (await tmpToken).tmpToken, {
-        httpOnly: true,
-        secure: false,
-      });
-      res.redirect('/to-front/fail');
-      return;
-    }
+    this.authService.setTokenToCookie(req, res);
   }
 
   @Public()
@@ -106,29 +59,7 @@ export class AuthController {
   @Get('/callback/naver')
   @UseGuards(AuthGuard('naver'))
   async callbackNaver(@Req() req: Request, @Res() res: Response) {
-    if (req.user) {
-      const { provider, providerId, email } = req.user as AuthLoginDto;
-
-      const user = await this.userService.findUserByProviderId(providerId);
-
-      if (user) {
-        const accessToken = this.authService.signIn2(providerId);
-        res.cookie('Authentication', (await accessToken).accessToken, {
-          httpOnly: true,
-          secure: false,
-        });
-        res.redirect('/to-front/success');
-        return;
-      }
-
-      const tmpToken = this.authService.tempSignUp(provider, providerId, email);
-      res.cookie('info', (await tmpToken).tmpToken, {
-        httpOnly: true,
-        secure: false,
-      });
-      res.redirect('/to-front/fail');
-      return;
-    }
+    this.authService.setTokenToCookie(req, res);
   }
 
   @Public()
@@ -140,29 +71,7 @@ export class AuthController {
   @Get('/callback/kakao')
   @UseGuards(AuthGuard('kakao'))
   async callbackKakao(@Req() req: Request, @Res() res: Response) {
-    if (req.user) {
-      const { provider, providerId, email } = req.user as AuthLoginDto;
-
-      const user = await this.userService.findUserByProviderId(providerId);
-
-      if (user) {
-        const accessToken = this.authService.signIn2(providerId);
-        res.cookie('Authentication', (await accessToken).accessToken, {
-          httpOnly: true,
-          secure: false,
-        });
-        res.redirect('/to-front/success');
-        return;
-      }
-
-      const tmpToken = this.authService.tempSignUp(provider, providerId, email);
-      res.cookie('info', (await tmpToken).tmpToken, {
-        httpOnly: true,
-        secure: false,
-      });
-      res.redirect('/to-front/fail');
-      return;
-    }
+    this.authService.setTokenToCookie(req, res);
   }
 
   @Public()
