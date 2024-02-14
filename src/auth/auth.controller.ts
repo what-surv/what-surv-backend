@@ -87,12 +87,8 @@ export class AuthController {
         return;
       }
 
-      const tmp_token = this.authService.tempSignUp(
-        provider,
-        providerId,
-        email,
-      );
-      res.cookie('info', (await tmp_token).tmpToken, {
+      const tmpToken = this.authService.tempSignUp(provider, providerId, email);
+      res.cookie('info', (await tmpToken).tmpToken, {
         httpOnly: true,
         secure: false,
       });
