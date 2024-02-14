@@ -40,12 +40,29 @@ export class AuthService {
     };
 
     return {
-      tmp_token: await this.jwtService.signAsync(payload),
+      tmpToken: await this.jwtService.signAsync(payload),
     };
   }
 
   async signUp(user: User) {
     this.userService.signUp(user);
+  }
+
+  // 이름 변경 필요
+  async signIn2(providerId: string) {
+    const user = await this.userService.findUserByProviderId(providerId);
+
+    if (isNil(user)) {
+      throw new UnauthorizedException();
+    }
+
+    const payload = {
+      id: user.id,
+      roles: user.role,
+    };
+    return {
+      accessToken: await this.jwtService.signAsync(payload),
+    };
   }
 
   async makeUser(authLoginDto: AuthLoginDto, authSignUpDto: AuthSignUpDto) {

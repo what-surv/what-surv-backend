@@ -78,7 +78,8 @@ export class AuthController {
       const user = await this.userService.findUserByProviderId(providerId);
 
       if (user) {
-        res.cookie('Authentication', 'token', {
+        const accessToken = this.authService.signIn2(providerId);
+        res.cookie('Authentication', (await accessToken).accessToken, {
           httpOnly: true,
           secure: false,
         });
@@ -91,7 +92,7 @@ export class AuthController {
         providerId,
         email,
       );
-      res.cookie('info', (await tmp_token).tmp_token, {
+      res.cookie('info', (await tmp_token).tmpToken, {
         httpOnly: true,
         secure: false,
       });
@@ -115,7 +116,8 @@ export class AuthController {
       const user = await this.userService.findUserByProviderId(providerId);
 
       if (user) {
-        res.cookie('Authentication', 'token', {
+        const accessToken = this.authService.signIn2(providerId);
+        res.cookie('Authentication', (await accessToken).accessToken, {
           httpOnly: true,
           secure: false,
         });
@@ -123,12 +125,8 @@ export class AuthController {
         return;
       }
 
-      const tmp_token = this.authService.tempSignUp(
-        provider,
-        providerId,
-        email,
-      );
-      res.cookie('info', (await tmp_token).tmp_token, {
+      const tmpToken = this.authService.tempSignUp(provider, providerId, email);
+      res.cookie('info', (await tmpToken).tmpToken, {
         httpOnly: true,
         secure: false,
       });
@@ -152,7 +150,8 @@ export class AuthController {
       const user = await this.userService.findUserByProviderId(providerId);
 
       if (user) {
-        res.cookie('Authentication', 'token', {
+        const accessToken = this.authService.signIn2(providerId);
+        res.cookie('Authentication', (await accessToken).accessToken, {
           httpOnly: true,
           secure: false,
         });
@@ -160,12 +159,8 @@ export class AuthController {
         return;
       }
 
-      const tmp_token = this.authService.tempSignUp(
-        provider,
-        providerId,
-        email,
-      );
-      res.cookie('info', (await tmp_token).tmp_token, {
+      const tmpToken = this.authService.tempSignUp(provider, providerId, email);
+      res.cookie('info', (await tmpToken).tmpToken, {
         httpOnly: true,
         secure: false,
       });
