@@ -62,12 +62,12 @@ export class AuthService {
     };
   }
 
-  async makeUser(authLoginDto: JwtUserDto, authSignUpDto: AuthSignUpDto) {
+  async makeUser(jwtUserDto: JwtUserDto, authSignUpDto: AuthSignUpDto) {
     const user = new User();
 
-    user.provider = authLoginDto.provider;
-    user.providerId = authLoginDto.providerId;
-    user.email = authLoginDto.email;
+    user.provider = jwtUserDto.provider;
+    user.providerId = jwtUserDto.providerId;
+    user.email = jwtUserDto.email;
     user.nickname = authSignUpDto.nickname;
     user.gender = authSignUpDto.gender;
     user.job = authSignUpDto.job;
