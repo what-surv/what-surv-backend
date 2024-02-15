@@ -11,13 +11,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { AuthSignUpDto } from './auth.dto';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { Public, isNil } from 'src/common/utils';
+import { AuthSignUpDto } from './auth.dto';
 import { AuthService } from './auth.service';
 import { CustomJwtGuard } from './custom-jwt.guard';
-import { SignInDto, signInDtoBodyOptions } from './dto/sign-in.dto';
+import { MockSignInDto, signInDtoBodyOptions } from './dto/mock-sign-in.dto';
 
 @ApiTags('Authorization')
 @Controller('auth')
@@ -73,14 +73,17 @@ export class AuthController {
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async signIn(@Body() signInDto: SignInDto, @Res() res: Response) {
-    const { username, password } = signInDto;
+  async mockSignIn(@Body() mockSignInDto: MockSignInDto, @Res() res: Response) {
+    const { username, password } = mockSignInDto;
 
     if (isNil(username) || isNil(password)) {
       throw new UnauthorizedException();
     }
 
-    const { accessToken } = await this.authService.signIn(username, password);
+    const { accessToken } = await this.authService.mockSignIn(
+      username,
+      password,
+    );
 
     res.cookie('Authentication', accessToken, { httpOnly: true });
     res.send({ accessToken });

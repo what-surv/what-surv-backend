@@ -1,7 +1,7 @@
 import { ApiBodyOptions, ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, MinLength } from 'class-validator';
 
-export class SignInDto {
+export class MockSignInDto {
   @ApiProperty({ example: 'user' })
   @IsNotEmpty({ message: 'username is required' })
   @IsString({ message: 'username must be a string' })
@@ -15,7 +15,7 @@ export class SignInDto {
 }
 
 export const signInDtoBodyOptions: ApiBodyOptions = {
-  type: SignInDto,
+  type: MockSignInDto,
   description: 'username, password',
   required: true,
   examples: {

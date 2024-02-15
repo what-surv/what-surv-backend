@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { Role } from 'src/auth/role/role';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Role } from 'src/auth/role/role';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
-export type Users = {
+export type MockUser = {
   userId: number;
   username: string;
   password: string;
@@ -16,7 +16,7 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
-  private readonly users = [
+  private readonly mockUsers = [
     {
       userId: 1,
       username: 'user',
@@ -31,8 +31,8 @@ export class UserService {
     },
   ];
 
-  async findOne(username: string): Promise<Users | undefined> {
-    return this.users.find((user) => user.username === username);
+  async findOne(username: string): Promise<MockUser | undefined> {
+    return this.mockUsers.find((user) => user.username === username);
   }
 
   async findAllUsers(): Promise<User[]> {
