@@ -17,7 +17,7 @@ const envFilePath =
       useClass: TypeormConfig,
     }),
     ConfigModule.forRoot({
-      envFilePath: envFilePath,
+      envFilePath,
       isGlobal: true,
     }),
     AuthModule,
