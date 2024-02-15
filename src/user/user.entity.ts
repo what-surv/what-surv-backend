@@ -21,7 +21,7 @@ export class User {
   providerId!: string;
 
   @Column({ default: Role.User })
-  roles!: Role;
+  role!: Role;
 
   @CreateDateColumn({ type: 'timestamp without time zone' })
   createdDate?: Date;

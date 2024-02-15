@@ -1,11 +1,11 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
+import { Request, Response } from 'express';
 import { isNil } from 'src/common/utils';
 import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
 import { AuthLoginDto, AuthSignUpDto } from './auth.dto';
-import { Request, Response } from 'express';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -15,7 +15,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn(
+  async mockSignIn(
     username: string,
     pass: string,
   ): Promise<{ accessToken: string }> {
@@ -77,7 +77,7 @@ export class AuthService {
   }
 
   // 이름 변경 필요
-  async signIn2(providerId: string) {
+  async signIn(providerId: string) {
     const user = await this.userService.findUserByProviderId(providerId);
 
     if (isNil(user)) {
@@ -86,7 +86,7 @@ export class AuthService {
 
     const payload = {
       id: user.id,
-      roles: user.roles,
+      roles: user.role,
     };
     return {
       accessToken: await this.jwtService.signAsync(payload),
@@ -115,7 +115,7 @@ export class AuthService {
       const clientUrl = await this.configService.get<string>('CLIENT_URL');
 
       if (user) {
-        const accessToken = (await this.signIn2(providerId)).accessToken;
+        const accessToken = (await this.signIn(providerId)).accessToken;
 
         res.cookie('Authentication', accessToken, {
           httpOnly: true,
