@@ -2,6 +2,7 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -13,6 +14,7 @@ import { JwtUserDto } from './auth.dto';
 
 @Injectable()
 export class CustomJwtGuard implements CanActivate {
+  private readonly logger = new Logger(CustomJwtGuard.name);
   constructor(
     private readonly jwtService: JwtService,
     private readonly reflector: Reflector,
@@ -35,6 +37,7 @@ export class CustomJwtGuard implements CanActivate {
       this.extractTokenFromHeader(request) ?? request.cookies?.Authentication;
 
     if (isNil(token)) {
+      this.logger.debug('Token is missing!');
       throw new UnauthorizedException();
     }
 
@@ -45,8 +48,8 @@ export class CustomJwtGuard implements CanActivate {
 
       request['user'] = payload;
     } catch (e) {
-      console.error('Token is invalid!');
-      console.error(e);
+      this.logger.debug('Token is invalid!');
+      this.logger.debug(e);
 
       throw new UnauthorizedException();
     }

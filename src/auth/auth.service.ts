@@ -98,7 +98,7 @@ export class AuthService {
     const token = await this.jwtService.signAsync(jwtUser);
 
     const redirectPath = isNil(user) ? '/login/new-user' : '/login/success';
-    res.cookie('info', token, {
+    res.cookie('Authentication', token, {
       httpOnly: true,
       secure: false,
     });
