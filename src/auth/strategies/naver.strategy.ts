@@ -1,7 +1,7 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-naver';
-import { AuthLoginDto } from '../auth.dto';
 import { isNil } from 'src/common/utils';
+import { OAuthUserDto } from '../auth.dto';
 
 export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
   constructor() {
@@ -18,7 +18,7 @@ export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
     if (isNil(email)) {
       throw new Error('email undefined');
     }
-    const user: AuthLoginDto = new AuthLoginDto('naver', profile.id, email);
+    const user: OAuthUserDto = new OAuthUserDto('naver', profile.id, email);
     return user;
   }
 }

@@ -9,6 +9,7 @@ import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY, isNil } from 'src/common/utils';
+import { JwtUserDto } from './auth.dto';
 
 @Injectable()
 export class CustomJwtGuard implements CanActivate {
@@ -38,7 +39,7 @@ export class CustomJwtGuard implements CanActivate {
     }
 
     try {
-      const payload = await this.jwtService.verifyAsync(token, {
+      const payload: JwtUserDto = await this.jwtService.verifyAsync(token, {
         secret: this.configService.get<string>('JWT_SECRET'),
       });
 
