@@ -18,6 +18,8 @@ import { AuthSignUpDto } from './auth.dto';
 import { AuthService } from './auth.service';
 import { CustomJwtGuard } from './custom-jwt.guard';
 import { MockSignInDto, signInDtoBodyOptions } from './dto/mock-sign-in.dto';
+import { Role } from './role/role';
+import { Roles } from './role/role.decorator';
 
 @ApiTags('Authorization')
 @Controller('auth')
@@ -91,9 +93,16 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Profile' })
   @UseGuards(CustomJwtGuard)
-  @Get('profile')
+  @Get('/profile')
   @HttpCode(HttpStatus.OK)
   getProfile(@Req() req: Request) {
+    return req.user;
+  }
+
+  @UseGuards(CustomJwtGuard)
+  @Roles(Role.NotYetSignedUp)
+  @Get('/new-user/profile')
+  isNotYetSignedUp(@Req() req: Request) {
     return req.user;
   }
 }

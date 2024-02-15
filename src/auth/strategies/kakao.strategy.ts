@@ -1,7 +1,7 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-kakao';
-import { AuthLoginDto } from '../auth.dto';
 import { isNil } from 'src/common/utils';
+import { OAuthUserDto } from '../auth.dto';
 
 export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
   constructor() {
@@ -19,7 +19,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
       throw new Error('email undefined');
     }
 
-    const user: AuthLoginDto = new AuthLoginDto('kakao', profile.id, email);
+    const user: OAuthUserDto = new OAuthUserDto('kakao', profile.id, email);
     return user;
   }
 }

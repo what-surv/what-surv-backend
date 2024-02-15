@@ -1,7 +1,7 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-google-oauth20';
-import { AuthLoginDto } from '../auth.dto';
 import { isNil } from 'src/common/utils';
+import { OAuthUserDto } from '../auth.dto';
 
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor() {
@@ -30,7 +30,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       throw new Error('email undefined');
     }
 
-    const user: AuthLoginDto = new AuthLoginDto('google', id, email);
+    const user: OAuthUserDto = new OAuthUserDto('google', id, email);
     return user;
   }
 }

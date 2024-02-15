@@ -1,51 +1,21 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { Request, Response } from 'express';
 import { isNil } from 'src/common/utils';
 import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
-import { AuthLoginDto, AuthSignUpDto } from './auth.dto';
+import { AuthSignUpDto, JwtUserDto } from './auth.dto';
+import { Role } from './role/role';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
   constructor(
     private readonly userService: UserService,
     private readonly configService: ConfigService,
     private jwtService: JwtService,
   ) {}
-
-  async mockSignIn(
-    username: string,
-    pass: string,
-  ): Promise<{ accessToken: string }> {
-    const user = await this.userService.findOne(username);
-
-    if (isNil(user) || user.password !== pass) {
-      throw new UnauthorizedException();
-    }
-
-    const payload = {
-      sub: user.userId,
-      username: user.username,
-      roles: user.roles,
-    };
-    return {
-      accessToken: await this.jwtService.signAsync(payload),
-    };
-  }
-
-  async tempSignUp(provider: string, providerId: string, email: string) {
-    const payload = {
-      provider: provider,
-      providerId: providerId,
-      email: email,
-    };
-
-    return {
-      tmpToken: await this.jwtService.signAsync(payload),
-    };
-  }
 
   async signUp(req: Request, authSignUpDto: AuthSignUpDto) {
     const [_type, token] = req?.headers?.authorization?.split(' ') ?? [];
@@ -55,7 +25,7 @@ export class AuthService {
     }
 
     try {
-      const payload: AuthLoginDto = await this.jwtService.verifyAsync(token, {
+      const payload: JwtUserDto = await this.jwtService.verifyAsync(token, {
         secret: this.configService.get<string>('JWT_SECRET'),
       });
 
@@ -76,7 +46,6 @@ export class AuthService {
     }
   }
 
-  // 이름 변경 필요
   async signIn(providerId: string) {
     const user = await this.userService.findUserByProviderId(providerId);
 
@@ -93,12 +62,12 @@ export class AuthService {
     };
   }
 
-  async makeUser(authLoginDto: AuthLoginDto, authSignUpDto: AuthSignUpDto) {
+  async makeUser(jwtUserDto: JwtUserDto, authSignUpDto: AuthSignUpDto) {
     const user = new User();
 
-    user.provider = authLoginDto.provider;
-    user.providerId = authLoginDto.providerId;
-    user.email = authLoginDto.email;
+    user.provider = jwtUserDto.provider;
+    user.providerId = jwtUserDto.providerId;
+    user.email = jwtUserDto.email;
     user.nickname = authSignUpDto.nickname;
     user.gender = authSignUpDto.gender;
     user.job = authSignUpDto.job;
@@ -108,33 +77,53 @@ export class AuthService {
   }
 
   async setTokenToCookie(req: Request, res: Response) {
-    if (req.user) {
-      const { provider, providerId, email } = req.user as AuthLoginDto;
-
-      const user = await this.userService.findUserByProviderId(providerId);
-      const clientUrl = await this.configService.get<string>('CLIENT_URL');
-
-      if (user) {
-        const accessToken = (await this.signIn(providerId)).accessToken;
-
-        res.cookie('Authentication', accessToken, {
-          httpOnly: true,
-          secure: false,
-        });
-        res.redirect(`${clientUrl}/login/success`);
-        return;
-      }
-
-      const tmpToken = (await this.tempSignUp(provider, providerId, email))
-        .tmpToken;
-
-      res.cookie('info', tmpToken, {
-        httpOnly: true,
-        secure: false,
-      });
-      res.redirect(`${clientUrl}/login/new-user`);
-      return;
+    if (isNil(req.user)) {
+      throw new UnauthorizedException();
     }
-    return;
+
+    const clientUrl = await this.configService.get<string>('CLIENT_URL');
+
+    const { provider, providerId, email } = req.user as JwtUserDto;
+
+    const user = await this.userService.findUserByProviderId(providerId); // TODO: check both provider & providerId
+
+    const jwtUser: JwtUserDto = {
+      nickname: user?.nickname || 'new user',
+      provider: provider,
+      providerId: providerId,
+      email: email,
+      role: user?.role ?? Role.NotYetSignedUp,
+    };
+
+    const token = await this.jwtService.signAsync(jwtUser);
+
+    const redirectPath = isNil(user) ? '/login/new-user' : '/login/success';
+    res.cookie('Authentication', token, {
+      httpOnly: true,
+      secure: false,
+    });
+    return res.redirect(`${clientUrl}${redirectPath}`);
+  }
+
+  async mockSignIn(
+    username: string,
+    pass: string,
+  ): Promise<{ accessToken: string }> {
+    const user = await this.userService.findOneMockUser(username);
+
+    if (isNil(user) || user.password !== pass) {
+      throw new UnauthorizedException();
+    }
+
+    const payload: JwtUserDto = {
+      nickname: user.username,
+      provider: 'mock',
+      providerId: '123412341234',
+      email: 'mock@mock.com',
+      role: user.roles[0],
+    };
+    return {
+      accessToken: await this.jwtService.signAsync(payload),
+    };
   }
 }

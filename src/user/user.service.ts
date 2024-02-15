@@ -31,7 +31,7 @@ export class UserService {
     },
   ];
 
-  async findOne(username: string): Promise<MockUser | undefined> {
+  async findOneMockUser(username: string): Promise<MockUser | undefined> {
     return this.mockUsers.find((user) => user.username === username);
   }
 
