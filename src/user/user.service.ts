@@ -39,9 +39,15 @@ export class UserService {
     return this.userRepository.find();
   }
 
-  async findUserByProviderId(providerId: string): Promise<User | null> {
+  async findUserByProviderAndProviderId(
+    provider: string,
+    providerId: string,
+  ): Promise<User | null> {
     return this.userRepository.findOne({
-      where: { providerId: providerId },
+      where: {
+        provider,
+        providerId,
+      },
     });
   }
 

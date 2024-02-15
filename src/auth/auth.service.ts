@@ -60,7 +60,12 @@ export class AuthService {
       });
 
       if (
-        !isNil(await this.userService.findUserByProviderId(payload.providerId))
+        !isNil(
+          await this.userService.findUserByProviderAndProviderId(
+            payload.provider,
+            payload.providerId,
+          ),
+        )
       ) {
         throw new Error('User Already Registered');
       }
@@ -76,14 +81,17 @@ export class AuthService {
     }
   }
 
-  // 이름 변경 필요
-  async signIn(providerId: string) {
-    const user = await this.userService.findUserByProviderId(providerId);
+  async signIn(provider: string, providerId: string) {
+    const user = await this.userService.findUserByProviderAndProviderId(
+      provider,
+      providerId,
+    );
 
     if (isNil(user)) {
       throw new UnauthorizedException();
     }
 
+    // payload에 뭘 담아줘야 할까요
     const payload = {
       id: user.id,
       roles: user.role,
@@ -111,11 +119,15 @@ export class AuthService {
     if (req.user) {
       const { provider, providerId, email } = req.user as AuthLoginDto;
 
-      const user = await this.userService.findUserByProviderId(providerId);
+      const user = await this.userService.findUserByProviderAndProviderId(
+        provider,
+        providerId,
+      );
       const clientUrl = await this.configService.get<string>('CLIENT_URL');
 
       if (user) {
-        const accessToken = (await this.signIn(providerId)).accessToken;
+        const accessToken = (await this.signIn(provider, providerId))
+          .accessToken;
 
         res.cookie('Authentication', accessToken, {
           httpOnly: true,
@@ -128,6 +140,7 @@ export class AuthService {
       const tmpToken = (await this.tempSignUp(provider, providerId, email))
         .tmpToken;
 
+      console.log(tmpToken);
       res.cookie('info', tmpToken, {
         httpOnly: true,
         secure: false,
