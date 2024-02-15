@@ -5,7 +5,7 @@ import { Request, Response } from 'express';
 import { isNil } from 'src/common/utils';
 import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
-import { AuthSignUpDto, JwtUserDto, OAuthUserDto } from './auth.dto';
+import { AuthSignUpDto, JwtUserDto } from './auth.dto';
 import { Role } from './role/role';
 
 @Injectable()
@@ -25,7 +25,7 @@ export class AuthService {
     }
 
     try {
-      const payload: OAuthUserDto = await this.jwtService.verifyAsync(token, {
+      const payload: JwtUserDto = await this.jwtService.verifyAsync(token, {
         secret: this.configService.get<string>('JWT_SECRET'),
       });
 
@@ -62,7 +62,7 @@ export class AuthService {
     };
   }
 
-  async makeUser(authLoginDto: OAuthUserDto, authSignUpDto: AuthSignUpDto) {
+  async makeUser(authLoginDto: JwtUserDto, authSignUpDto: AuthSignUpDto) {
     const user = new User();
 
     user.provider = authLoginDto.provider;
@@ -83,7 +83,7 @@ export class AuthService {
 
     const clientUrl = await this.configService.get<string>('CLIENT_URL');
 
-    const { provider, providerId, email } = req.user as OAuthUserDto;
+    const { provider, providerId, email } = req.user as JwtUserDto;
 
     const user = await this.userService.findUserByProviderId(providerId); // TODO: check both provider & providerId
 
