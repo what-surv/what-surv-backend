@@ -59,4 +59,9 @@ export class UserService {
     await this.userRepository.save(user);
     return user;
   }
+
+  async nicknameExists(nickname: string): Promise<boolean> {
+    const user = await this.userRepository.findOne({ where: { nickname } });
+    return user ? true : false;
+  }
 }
