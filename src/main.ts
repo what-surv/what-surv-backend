@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule } from '@nestjs/swagger';
 import * as dotenv from 'dotenv';
@@ -6,7 +7,13 @@ import { morganSetup } from './common/morgan/morgan.setup';
 import { BaseAPIDocument } from './config/swagger.documents';
 
 Error.stackTraceLimit = Infinity;
-dotenv.config();
+
+const envFilePath =
+  process.env.NODE_ENV === 'production' ? '.env' : '.env.development';
+const logger = new Logger('bootstrap');
+logger.log(`Application is running in ${process.env.NODE_ENV} mode`);
+
+dotenv.config({ path: envFilePath });
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
