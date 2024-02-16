@@ -30,7 +30,12 @@ export class AuthService {
       });
 
       if (
-        !isNil(await this.userService.findUserByProviderId(payload.providerId))
+        !isNil(
+          await this.userService.findUserByProviderAndProviderId(
+            payload.provider,
+            payload.providerId,
+          ),
+        )
       ) {
         throw new Error('User Already Registered');
       }
@@ -46,13 +51,17 @@ export class AuthService {
     }
   }
 
-  async signIn(providerId: string) {
-    const user = await this.userService.findUserByProviderId(providerId);
+  async signIn(provider: string, providerId: string) {
+    const user = await this.userService.findUserByProviderAndProviderId(
+      provider,
+      providerId,
+    );
 
     if (isNil(user)) {
       throw new UnauthorizedException();
     }
 
+    // payload에 뭘 담아줘야 할까요
     const payload = {
       id: user.id,
       roles: user.role,
@@ -85,7 +94,10 @@ export class AuthService {
 
     const { provider, providerId, email } = req.user as JwtUserDto;
 
-    const user = await this.userService.findUserByProviderId(providerId); // TODO: check both provider & providerId
+    const user = await this.userService.findUserByProviderAndProviderId(
+      provider,
+      providerId,
+    );
 
     const jwtUser: JwtUserDto = {
       nickname: user?.nickname || 'new user',

@@ -3,10 +3,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
 @Entity()
+@Index('idx_provider_providerId', ['provider', 'providerId'], { unique: true })
 export class User {
   @PrimaryGeneratedColumn()
   id!: number;
