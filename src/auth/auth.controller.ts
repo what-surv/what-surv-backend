@@ -14,7 +14,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { Public, isNil } from 'src/common/utils';
-import { AuthSignUpDto } from './auth.dto';
+import { AuthSignUpDto, JwtUserDto, ProfileResponseDto } from './auth.dto';
 import { AuthService } from './auth.service';
 import { CustomJwtGuard } from './custom-jwt.guard';
 import { MockSignInDto, signInDtoBodyOptions } from './dto/mock-sign-in.dto';
@@ -26,10 +26,11 @@ import { Roles } from './role/role.decorator';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Public()
+  @Roles(Role.NotYetSignedUp)
   @Post('/sign-up')
   async signUp(@Req() req: Request, @Body() authSignUpDto: AuthSignUpDto) {
-    this.authService.signUp(req, authSignUpDto);
+    const jwtUserDto = req.user as JwtUserDto;
+    this.authService.signUp(jwtUserDto, authSignUpDto);
   }
 
   @Public()
@@ -95,14 +96,15 @@ export class AuthController {
   @UseGuards(CustomJwtGuard)
   @Get('/profile')
   @HttpCode(HttpStatus.OK)
-  getProfile(@Req() req: Request) {
-    return req.user;
+  getProfile(@Req() req: Request): ProfileResponseDto {
+    const { nickname, email } = req.user as JwtUserDto;
+    return { nickname, email };
   }
 
-  @UseGuards(CustomJwtGuard)
   @Roles(Role.NotYetSignedUp)
   @Get('/new-user/profile')
-  isNotYetSignedUp(@Req() req: Request) {
-    return req.user;
+  isNotYetSignedUp(@Req() req: Request): ProfileResponseDto {
+    const { nickname, email } = req.user as JwtUserDto;
+    return { nickname, email };
   }
 }

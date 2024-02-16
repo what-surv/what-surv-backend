@@ -1,6 +1,6 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { JwtService, TokenExpiredError } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
 import { Request, Response } from 'express';
 import { isNil } from 'src/common/utils';
 import { User } from 'src/user/user.entity';
@@ -17,42 +17,32 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signUp(req: Request, authSignUpDto: AuthSignUpDto) {
-    const [_type, token] = req?.headers?.authorization?.split(' ') ?? [];
-
-    if (isNil(token)) {
-      throw new UnauthorizedException('need token');
+  async signUp(jwtUserDto: JwtUserDto, authSignUpDto: AuthSignUpDto) {
+    const { provider, providerId, email } = jwtUserDto;
+    if (
+      await this.userService.findByProviderAndProviderId(provider, providerId)
+    ) {
+      throw new UnauthorizedException('User Already Registered');
     }
 
-    try {
-      const payload: JwtUserDto = await this.jwtService.verifyAsync(token, {
-        secret: this.configService.get<string>('JWT_SECRET'),
-      });
+    const { nickname, gender, birthDate, job } = authSignUpDto;
 
-      if (
-        !isNil(
-          await this.userService.findUserByProviderAndProviderId(
-            payload.provider,
-            payload.providerId,
-          ),
-        )
-      ) {
-        throw new Error('User Already Registered');
-      }
+    const user = new User();
+    user.role = Role.User;
+    user.provider = provider;
+    user.providerId = providerId;
+    user.email = email;
+    user.nickname = nickname;
+    user.gender = gender;
+    user.birthDate = birthDate;
+    user.job = job; // TODO: is it necessary?
+    // TODO: user phone?
 
-      const user = await this.makeUser(payload, authSignUpDto);
-
-      this.userService.signUp(user);
-    } catch (e) {
-      if (e instanceof TokenExpiredError) {
-        throw new UnauthorizedException('jwt expired');
-      }
-      console.error(e);
-    }
+    this.userService.save(user);
   }
 
   async signIn(provider: string, providerId: string) {
-    const user = await this.userService.findUserByProviderAndProviderId(
+    const user = await this.userService.findByProviderAndProviderId(
       provider,
       providerId,
     );
@@ -71,20 +61,6 @@ export class AuthService {
     };
   }
 
-  async makeUser(jwtUserDto: JwtUserDto, authSignUpDto: AuthSignUpDto) {
-    const user = new User();
-
-    user.provider = jwtUserDto.provider;
-    user.providerId = jwtUserDto.providerId;
-    user.email = jwtUserDto.email;
-    user.nickname = authSignUpDto.nickname;
-    user.gender = authSignUpDto.gender;
-    user.job = authSignUpDto.job;
-    user.birthDate = authSignUpDto.birthDate;
-
-    return user;
-  }
-
   async setTokenToCookie(req: Request, res: Response) {
     if (isNil(req.user)) {
       throw new UnauthorizedException();
@@ -94,7 +70,7 @@ export class AuthService {
 
     const { provider, providerId, email } = req.user as JwtUserDto;
 
-    const user = await this.userService.findUserByProviderAndProviderId(
+    const user = await this.userService.findByProviderAndProviderId(
       provider,
       providerId,
     );
