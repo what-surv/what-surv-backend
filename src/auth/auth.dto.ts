@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 import { Role } from './role/role';
 
 export class OAuthUserDto {
@@ -17,13 +17,36 @@ export interface JwtUserDto {
   email: string;
 }
 
-export class AuthSignUpDto {
-  public role?: Role;
+export interface SignUpDto {
+  nickname: string;
+  phone: string;
+  gender: string;
+  advertisingConsent: boolean;
+}
+
+export class AuthSignUpDto implements SignUpDto {
   @IsString()
-  public nickname?: string;
+  @IsNotEmpty()
+  public nickname!: string;
+
   @IsString()
-  public gender?: string;
+  @IsNotEmpty()
+  public phone!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  public gender!: string;
+
+  @IsNotEmpty()
+  public advertisingConsent!: boolean;
+
   @IsString()
   public job?: string;
+  public role?: Role;
   public birthDate?: Date;
+}
+
+export interface ProfileResponseDto {
+  nickname: string;
+  email: string;
 }

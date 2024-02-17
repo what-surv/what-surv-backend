@@ -39,16 +39,14 @@ export class UserService {
     return this.userRepository.find();
   }
 
-  async findUserByProviderAndProviderId(
-    provider: string,
-    providerId: string,
-  ): Promise<User | null> {
+  async findByProviderAndProviderId(provider: string, providerId: string) {
     return this.userRepository.findOne({
-      where: {
-        provider,
-        providerId,
-      },
+      where: { provider, providerId },
     });
+  }
+
+  async save(user: User): Promise<User> {
+    return this.userRepository.save(user);
   }
 
   async deleteUser(id: number): Promise<void> {
