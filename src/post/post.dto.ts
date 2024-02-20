@@ -8,21 +8,9 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { Gender, Post } from './entities/post.entity';
+import { Gender } from './post.entity';
 
-class PostDto extends PartialType(Post) {
-  title!: string; // 제목
-  enddate!: Date; // 마감일
-  gender!: Gender; // 성별
-  age!: string[]; // 연령
-  researchType!: string; // 리서치 종류
-  link!: string; // 링크
-  procedure!: string; // 진행방식
-  time!: string; // 소요 시간
-  content!: string; // 본문
-}
-
-export class PostCreateDto implements PostDto {
+export class PostCreateDto {
   @IsString()
   @MinLength(3)
   @MaxLength(50)
@@ -55,4 +43,4 @@ export class PostCreateDto implements PostDto {
   content!: string;
 }
 
-export class PostUpdateDto extends PartialType(PostDto) {}
+export class PostUpdateDto extends PartialType(PostCreateDto) {}
