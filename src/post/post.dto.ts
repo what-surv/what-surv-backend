@@ -8,7 +8,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { Gender } from './post.entity';
+import { Gender, IsValidGender } from 'src/post/gender';
 
 export class PostCreateDto {
   @IsString()
@@ -18,25 +18,26 @@ export class PostCreateDto {
 
   @Type(() => Date)
   @IsDate()
-  enddate!: Date;
+  endDate!: Date;
 
+  @IsValidGender()
   gender!: Gender;
 
   @IsArray()
   @IsString({ each: true })
-  age!: string[];
+  ages!: string[];
 
   @IsString()
   researchType!: string;
 
   @IsUrl()
-  link!: string;
+  url!: string;
 
   @IsString()
   procedure!: string;
 
   @IsString()
-  time!: string;
+  duration!: string;
 
   @IsString()
   @MaxLength(500)
