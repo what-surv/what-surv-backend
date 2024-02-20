@@ -29,16 +29,16 @@ export class PostController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.postService.findOne(+id);
+    return this.postService.findOne(Number(id));
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() postUpdateDto: PostUpdateDto) {
-    return this.postService.update(+id, postUpdateDto);
+    return this.postService.update(Number(id), postUpdateDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.postService.remove(+id);
+    return this.postService.remove(Number(id));
   }
 }
