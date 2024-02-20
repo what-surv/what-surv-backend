@@ -11,8 +11,9 @@ export class PostService {
     private readonly postRepository: Repository<Post>,
   ) {}
 
-  create(postCreateDto: PostCreateDto) {
-    return this.postRepository.save(postCreateDto);
+  create(_postCreateDto: PostCreateDto) {
+    // TODO
+    throw new Error('Method not implemented.');
   }
 
   findAll() {
@@ -25,8 +26,9 @@ export class PostService {
     });
   }
 
-  update(id: number, postUpdateDto: PostUpdateDto) {
-    return this.postRepository.update(id, postUpdateDto);
+  update(_id: number, _postUpdateDto: PostUpdateDto) {
+    // TODO
+    throw new Error('Method not implemented.');
   }
 
   remove(id: number) {
