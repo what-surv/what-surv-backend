@@ -23,7 +23,6 @@ export class PostService {
     return this.postRepository.findOne({
       where: { id },
     });
-    return `This action returns a #${id} post`;
   }
 
   update(id: number, postUpdateDto: PostUpdateDto) {
