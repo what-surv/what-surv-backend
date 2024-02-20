@@ -5,6 +5,7 @@ import * as cookieParser from 'cookie-parser';
 import { AuthModule } from './auth/auth.module';
 import { validationPipeProvider } from './common/validation-pipe';
 import { TypeormConfig } from './config/typeorm.config';
+import { PostModule } from './post/post.module';
 import { RoleExampleModule } from './role-example/role-example.module';
 import { UserModule } from './user/user.module';
 
@@ -23,6 +24,7 @@ const envFilePath =
     AuthModule,
     UserModule,
     RoleExampleModule,
+    PostModule,
   ],
   controllers: [],
   providers: [validationPipeProvider],
