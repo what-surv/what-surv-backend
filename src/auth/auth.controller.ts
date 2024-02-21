@@ -18,15 +18,15 @@ import { AuthSignUpDto, JwtUserDto, ProfileResponseDto } from './auth.dto';
 import { AuthService } from './auth.service';
 import { CustomJwtGuard } from './custom-jwt.guard';
 import { MockSignInDto, signInDtoBodyOptions } from './dto/mock-sign-in.dto';
-import { Role } from './role/role';
-import { Roles } from './role/role.decorator';
+import { Roles } from './role/role';
+import { RequireRoles } from './role/role.decorator';
 
 @ApiTags('Authorization')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Roles(Role.NotYetSignedUp)
+  @RequireRoles(Roles.NotYetSignedUp)
   @Post('/sign-up')
   async signUp(@Req() req: Request, @Body() authSignUpDto: AuthSignUpDto) {
     const jwtUserDto = req.user as JwtUserDto;
@@ -36,6 +36,7 @@ export class AuthController {
   @Public()
   @Get('/login/google')
   @UseGuards(AuthGuard('google'))
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   async loginGoogle(@Req() _req: Request, @Res() _res: Response) {}
 
   @Public()
@@ -48,6 +49,7 @@ export class AuthController {
   @Public()
   @Get('/login/naver')
   @UseGuards(AuthGuard('naver'))
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   async loginNaver(@Req() _req: Request, @Res() _res: Response) {}
 
   @Public()
@@ -60,6 +62,7 @@ export class AuthController {
   @Public()
   @Get('/login/kakao')
   @UseGuards(AuthGuard('kakao'))
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   async loginKakao(@Req() _req: Request, @Res() _res: Response) {}
 
   @Public()
@@ -75,7 +78,7 @@ export class AuthController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Sign In Success' })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
   @HttpCode(HttpStatus.OK)
-  @Post('login')
+  @Post('mock-login')
   async mockSignIn(@Body() mockSignInDto: MockSignInDto, @Res() res: Response) {
     const { username, password } = mockSignInDto;
 
@@ -101,7 +104,7 @@ export class AuthController {
     return { nickname, email };
   }
 
-  @Roles(Role.NotYetSignedUp)
+  @RequireRoles(Roles.NotYetSignedUp)
   @Get('/new-user/profile')
   isNotYetSignedUp(@Req() req: Request): ProfileResponseDto {
     const { nickname, email } = req.user as JwtUserDto;

@@ -13,7 +13,8 @@ export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
   }
 
   validate(_accessToken: string, _refreshToken: string, profile: Profile) {
-    const email = profile._json.email;
+    // eslint-disable-next-line no-underscore-dangle
+    const { email } = profile._json;
 
     if (isNil(email)) {
       throw new Error('email undefined');

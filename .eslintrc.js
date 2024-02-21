@@ -7,6 +7,8 @@ module.exports = {
   },
   plugins: ['@typescript-eslint/eslint-plugin'],
   extends: [
+    'airbnb-base',
+    'airbnb-typescript/base',
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
   ],
@@ -25,5 +27,9 @@ module.exports = {
       'error',
       { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
     ],
+    'import/prefer-default-export': 'off',
+    'import/no-default-export': 'error',
+    'class-methods-use-this': 'off',
+    'max-classes-per-file': 'off',
   },
 };
