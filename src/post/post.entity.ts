@@ -21,7 +21,7 @@ export class Post extends CommonEntity {
   researchType!: string;
 
   @Column({ type: 'varchar', length: 255 })
-  link!: string;
+  url!: string;
 
   @Column({ type: 'text' })
   procedure!: string;

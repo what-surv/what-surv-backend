@@ -37,6 +37,9 @@ export class PostCreateDto {
   procedure!: string;
 
   @IsString()
+  time!: string;
+
+  @IsString()
   duration!: string;
 
   @IsString()
