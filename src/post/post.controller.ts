@@ -8,9 +8,11 @@ import {
   Param,
   Patch,
   Post,
+  Req,
 } from '@nestjs/common';
 import { PostCreateDto, PostUpdateDto } from './post.dto';
 import { PostService } from './post.service';
+import { Request } from 'express';
 
 @Controller('posts')
 export class PostController {
@@ -18,8 +20,8 @@ export class PostController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() postCreateDto: PostCreateDto) {
-    return this.postService.create(postCreateDto);
+  create(@Req() req: Request, @Body() postCreateDto: PostCreateDto) {
+    return this.postService.create(req, postCreateDto);
   }
 
   @Get()
@@ -33,12 +35,16 @@ export class PostController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() postUpdateDto: PostUpdateDto) {
-    return this.postService.update(Number(id), postUpdateDto);
+  update(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Body() postUpdateDto: PostUpdateDto,
+  ) {
+    return this.postService.update(req, Number(id), postUpdateDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.postService.remove(Number(id));
+  remove(@Req() req: Request, @Param('id') id: string) {
+    return this.postService.remove(req, Number(id));
   }
 }
