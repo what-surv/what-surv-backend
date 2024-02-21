@@ -13,7 +13,8 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
   }
 
   validate(_accessToken: string, _refreshToken: string, profile: Profile) {
-    const email = profile._json.kakao_account.email;
+    // eslint-disable-next-line no-underscore-dangle
+    const { email } = profile._json.kakao_account;
 
     if (isNil(email)) {
       throw new Error('email undefined');

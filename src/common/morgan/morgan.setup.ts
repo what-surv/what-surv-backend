@@ -2,9 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import * as morgan from 'morgan';
 
 export const morganSetup = (app: INestApplication) => {
-  morgan.token('status-message', (req, res) => {
-    return res.statusMessage;
-  });
+  morgan.token('status-message', (req, res) => res.statusMessage);
 
   morgan.token('formatted-date', () => {
     const date = new Date();

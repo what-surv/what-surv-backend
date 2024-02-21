@@ -1,5 +1,5 @@
 import { CommonEntity } from 'src/common/common.entity';
-import { Gender, genderEnum } from 'src/post/gender';
+import { Gender, Genders } from 'src/post/gender';
 import { User } from 'src/user/user.entity';
 import { Column, Entity, ManyToOne } from 'typeorm';
 
@@ -11,7 +11,7 @@ export class Post extends CommonEntity {
   @Column({ type: 'timestamp' })
   endDate!: Date;
 
-  @Column({ type: 'enum', enum: genderEnum })
+  @Column({ type: 'enum', enum: Genders })
   gender!: Gender;
 
   @Column('simple-array')

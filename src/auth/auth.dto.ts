@@ -42,7 +42,9 @@ export class AuthSignUpDto implements SignUpDto {
 
   @IsString()
   public job?: string;
+
   public role?: Role;
+
   public birthDate?: Date;
 }
 

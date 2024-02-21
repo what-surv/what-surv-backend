@@ -1,8 +1,7 @@
 import { SetMetadata } from '@nestjs/common';
 
-export const isNil = (value: any): value is null | undefined => {
-  return value === null || value === undefined;
-};
+export const isNil = (value: any): value is null | undefined =>
+  value === null || value === undefined;
 
 export const IS_PUBLIC_KEY = 'isPublic';
 

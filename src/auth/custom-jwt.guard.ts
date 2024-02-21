@@ -15,6 +15,7 @@ import { JwtUserDto } from './auth.dto';
 @Injectable()
 export class CustomJwtGuard implements CanActivate {
   private readonly logger = new Logger(CustomJwtGuard.name);
+
   constructor(
     private readonly jwtService: JwtService,
     private readonly reflector: Reflector,
@@ -46,7 +47,7 @@ export class CustomJwtGuard implements CanActivate {
         secret: this.configService.get<string>('JWT_SECRET'),
       });
 
-      request['user'] = payload;
+      request.user = payload;
     } catch (e) {
       this.logger.debug('Token is invalid!');
       this.logger.debug(e);

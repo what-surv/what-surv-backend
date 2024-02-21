@@ -1,4 +1,4 @@
-import { Role } from 'src/auth/role/role';
+import { Role, Roles } from 'src/auth/role/role';
 import { CommonEntity } from 'src/common/common.entity';
 import { Column, CreateDateColumn, Entity, Index } from 'typeorm';
 
@@ -14,7 +14,7 @@ export class User extends CommonEntity {
   @Column()
   providerId!: string;
 
-  @Column({ default: Role.User })
+  @Column({ default: Roles.User })
   role!: Role;
 
   @CreateDateColumn({ type: 'timestamp without time zone' })

@@ -6,11 +6,12 @@ import { isNil } from 'src/common/utils';
 import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
 import { AuthSignUpDto, JwtUserDto } from './auth.dto';
-import { Role } from './role/role';
+import { Roles } from './role/role';
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly userService: UserService,
     private readonly configService: ConfigService,
@@ -28,7 +29,7 @@ export class AuthService {
     const { nickname, gender, birthDate, job } = authSignUpDto;
 
     const user = new User();
-    user.role = Role.User;
+    user.role = Roles.User;
     user.provider = provider;
     user.providerId = providerId;
     user.email = email;
@@ -77,10 +78,10 @@ export class AuthService {
 
     const jwtUser: JwtUserDto = {
       nickname: user?.nickname || 'new user',
-      provider: provider,
-      providerId: providerId,
-      email: email,
-      role: user?.role ?? Role.NotYetSignedUp,
+      provider,
+      providerId,
+      email,
+      role: user?.role ?? Roles.NotYetSignedUp,
     };
 
     const token = await this.jwtService.signAsync(jwtUser);
@@ -108,7 +109,7 @@ export class AuthService {
       provider: 'mock',
       providerId: '123412341234',
       email: 'mock@mock.com',
-      role: user.roles[0],
+      role: user.role,
     };
     return {
       accessToken: await this.jwtService.signAsync(payload),

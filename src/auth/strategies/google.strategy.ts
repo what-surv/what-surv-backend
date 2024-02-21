@@ -17,7 +17,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   validate(_accessToken: string, _refreshToken: string, profile: Profile) {
     const { id, emails } = profile;
 
-    let email = undefined;
+    let email;
 
     if (emails != null && emails.length > 0) {
       const primaryEmail = emails[0];

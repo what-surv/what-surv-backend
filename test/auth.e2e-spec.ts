@@ -9,72 +9,71 @@ describe('AppController (e2e)', () => {
     app = await createTestApp();
   });
 
-  it('GET /', () => {
-    return request(app.getHttpServer()).get('/').expect(404);
+  afterAll(async () => {
+    await app.close();
   });
 
-  it('POST /auth/login 401', () => {
-    return request(app.getHttpServer())
-      .post('/auth/login')
+  it('GET /', () => request(app.getHttpServer()).get('/').expect(404));
+
+  it('POST /auth/mock-login 401', () =>
+    request(app.getHttpServer())
+      .post('/auth/mock-login')
       .send({
         username: 'test',
         password: 'test',
       })
-      .expect(401);
-  });
+      .expect(401));
 
-  it('POST /auth/login validation pipe', () => {
-    return request(app.getHttpServer())
-      .post('/auth/login')
+  it('POST /auth/mock-login validation pipe', () =>
+    request(app.getHttpServer())
+      .post('/auth/mock-login')
       .send({
         username: 'user',
         password: 'userpw',
         white: 'this is not allowed',
       })
-      .expect(400);
-  });
+      .expect(400));
 
-  it('POST /auth/login 200', () => {
-    return request(app.getHttpServer())
-      .post('/auth/login')
+  it('POST /auth/mock-login 200', () =>
+    request(app.getHttpServer())
+      .post('/auth/mock-login')
       .send({
         username: 'user',
         password: 'userpw',
       })
-      .expect(200);
-  });
+      .expect(200));
 
   it('GET /auth/profile with header', async () => {
     const server = app.getHttpServer();
     const res = await request(server)
-      .post('/auth/login')
+      .post('/auth/mock-login')
       .send({
         username: 'user',
         password: 'userpw',
       })
       .expect(200);
 
-    expect(res.body.access_token).toBeDefined();
+    expect(res.body.accessToken).toBeDefined();
 
-    const { access_token } = res.body;
+    const { accessToken } = res.body;
 
     await request(server)
       .get('/auth/profile')
-      .set('Authorization', `Bearer ${access_token}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .expect(200);
   });
 
   it('GET /auth/profile with cookie', async () => {
     const server = app.getHttpServer();
     const res = await request(server)
-      .post('/auth/login')
+      .post('/auth/mock-login')
       .send({
         username: 'user',
         password: 'userpw',
       })
       .expect(200);
 
-    expect(res.body.access_token).toBeDefined();
+    expect(res.body.accessToken).toBeDefined();
 
     const cookies = res.header['set-cookie'];
 

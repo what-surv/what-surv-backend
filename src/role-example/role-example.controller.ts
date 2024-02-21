@@ -1,6 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Roles } from 'src/auth/role/role.decorator';
+import { Roles } from 'src/auth/role/role';
+import { RequireRoles } from 'src/auth/role/role.decorator';
 import { Public } from 'src/common/utils';
 
 @ApiTags('Role Example')
@@ -20,14 +21,14 @@ export class TempController {
   }
 
   @ApiOperation({ summary: 'User role requird endpoint' })
-  @Roles('user')
+  @RequireRoles(Roles.User)
   @Get('user')
   async userRoleRequired() {
     return 'you have User role';
   }
 
   @ApiOperation({ summary: 'Admin role required endpoint' })
-  @Roles('admin')
+  @RequireRoles(Roles.Admin)
   @Get('admin')
   async adminRoleRequired() {
     return 'you have Admin role';

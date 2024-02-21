@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Role } from 'src/auth/role/role';
+import { Role, Roles } from 'src/auth/role/role';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
+
 export type MockUser = {
   userId: number;
   username: string;
   password: string;
-  roles: Role[];
+  role: Role;
 };
 
 @Injectable()
@@ -16,18 +17,19 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
+
   private readonly mockUsers = [
     {
       userId: 1,
       username: 'user',
       password: 'userpw',
-      roles: [Role.User],
+      role: Roles.User,
     },
     {
       userId: 2,
       username: 'admin',
       password: 'adminpw',
-      roles: [Role.User, Role.Admin],
+      role: Roles.Admin,
     },
   ];
 
@@ -60,6 +62,6 @@ export class UserService {
 
   async nicknameExists(nickname: string): Promise<boolean> {
     const user = await this.userRepository.findOne({ where: { nickname } });
-    return user ? true : false;
+    return !!user;
   }
 }
