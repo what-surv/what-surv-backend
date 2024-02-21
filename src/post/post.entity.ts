@@ -27,7 +27,7 @@ export class Post extends CommonEntity {
   procedure!: string;
 
   @Column({ type: 'varchar', length: 255 })
-  time!: string;
+  duration!: string;
 
   @Column({ type: 'text' })
   content!: string;

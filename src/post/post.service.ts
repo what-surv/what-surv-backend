@@ -37,7 +37,7 @@ export class PostService {
     post.researchType = postCreateDto.researchType;
     post.url = postCreateDto.url;
     post.procedure = postCreateDto.procedure;
-    post.time = postCreateDto.time;
+    post.duration = postCreateDto.duration;
     post.content = postCreateDto.content;
     post.author = author;
     return this.postRepository.save(post);
@@ -73,7 +73,7 @@ export class PostService {
       throw new Error('post not found');
     }
 
-    if (post.author.id != author.id) {
+    if (post.author.id !== author.id) {
       throw new UnauthorizedException('Not the owner of Post');
     }
 
@@ -102,7 +102,7 @@ export class PostService {
     console.log(post.author);
     console.log(author);
 
-    if (post.author.id != author.id) {
+    if (post.author.id !== author.id) {
       throw new UnauthorizedException('Not the owner of Post');
     }
 
