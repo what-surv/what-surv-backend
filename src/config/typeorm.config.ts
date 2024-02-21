@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 @Injectable()
 export class TypeormConfig implements TypeOrmOptionsFactory {
@@ -19,6 +20,7 @@ export class TypeormConfig implements TypeOrmOptionsFactory {
       extra: {
         max: 100,
       },
+      namingStrategy: new SnakeNamingStrategy(),
     } as TypeOrmModuleOptions;
   }
 }
