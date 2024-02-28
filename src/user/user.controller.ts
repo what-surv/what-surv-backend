@@ -8,6 +8,7 @@ import {
 import { Request } from 'express';
 import { JwtUserDto } from 'src/auth/auth.dto';
 import { Public } from 'src/common/utils';
+import { OptionalParseIntPipe } from './pipe/optional.parseint.pipe';
 import { UserService } from './user.service';
 
 @Controller('users')
@@ -24,13 +25,17 @@ export class UserController {
 
   /* NOTICE: 공개 API라면 Querystring 반영 + Public 데코 추가 필요 */
   @Get('me/posts')
-  findAllMyPosts(@Req() req: Request) {
+  findAllMyPosts(
+    @Req() req: Request,
+    @Query('page', OptionalParseIntPipe)
+    page: number,
+  ) {
     const user = req.user as JwtUserDto;
 
     if (!user) {
       throw new UnauthorizedException();
     }
 
-    return this.userService.findAllMyPosts(user);
+    return this.userService.findAllMyPosts(user, page);
   }
 }
