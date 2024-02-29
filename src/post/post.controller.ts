@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   Req,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
@@ -31,8 +32,9 @@ export class PostController {
 
   @Public()
   @Get()
-  findAll() {
-    return this.postService.findAll();
+  find(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
+    const maxLimit = limit > 30 ? 30 : limit;
+    return this.postService.find(page, maxLimit);
   }
 
   @Public()
