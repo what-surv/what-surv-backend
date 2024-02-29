@@ -1,12 +1,14 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { PostCreateDto, PostUpdateDto } from './post.dto';
-import { Post } from './post.entity';
 import { Request } from 'express';
 import { JwtUserDto } from 'src/auth/auth.dto';
-import { UserService } from 'src/user/user.service';
 import { isNil } from 'src/common/utils';
+import { UserService } from 'src/user/user.service';
+import { Repository } from 'typeorm';
+
+import { PostCreateDto, PostUpdateDto } from './post.dto';
+
+import { Post } from './post.entity';
 
 @Injectable()
 export class PostService {
@@ -98,9 +100,6 @@ export class PostService {
     if (isNil(post)) {
       throw new Error('post not found');
     }
-
-    console.log(post.author);
-    console.log(author);
 
     if (post.author.id !== author.id) {
       throw new UnauthorizedException('Not the owner of Post');

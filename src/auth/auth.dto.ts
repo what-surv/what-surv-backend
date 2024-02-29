@@ -10,6 +10,7 @@ export class OAuthUserDto {
 }
 
 export interface JwtUserDto {
+  id: number;
   nickname: string;
   role: Role;
   provider: string;

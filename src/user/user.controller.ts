@@ -7,8 +7,8 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { JwtUserDto } from 'src/auth/auth.dto';
-import { Public } from 'src/common/utils';
-import { OptionalParseIntPipe } from './pipe/optional.parseint.pipe';
+import { Public } from 'src/auth/role/public.decorator';
+import { OptionalParseIntPipe } from 'src/user/pipe/optional.parseint.pipe';
 import { UserService } from './user.service';
 
 @Controller('users')

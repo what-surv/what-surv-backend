@@ -77,6 +77,7 @@ export class AuthService {
     );
 
     const jwtUser: JwtUserDto = {
+      id: user?.id || undefined;
       nickname: user?.nickname || 'new user',
       provider,
       providerId,

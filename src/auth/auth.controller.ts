@@ -13,7 +13,8 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-import { Public, isNil } from 'src/common/utils';
+import { Public } from 'src/auth/role/public.decorator';
+import { isNil } from 'src/common/utils';
 import { AuthSignUpDto, JwtUserDto, ProfileResponseDto } from './auth.dto';
 import { AuthService } from './auth.service';
 import { CustomJwtGuard } from './custom-jwt.guard';
