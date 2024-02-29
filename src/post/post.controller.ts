@@ -14,7 +14,7 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { Public } from 'src/auth/role/public.decorator';
-import { PostCreateDto, PostUpdateDto } from './post.dto';
+import { CreatePostDto, UpdatePostDto } from './dto/create-post.dto';
 import { PostService } from './post.service';
 
 @ApiTags('Posts')
@@ -24,7 +24,7 @@ export class PostController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Req() req: Request, @Body() postCreateDto: PostCreateDto) {
+  create(@Req() req: Request, @Body() postCreateDto: CreatePostDto) {
     return this.postService.create(req, postCreateDto);
   }
 
@@ -44,7 +44,7 @@ export class PostController {
   update(
     @Req() req: Request,
     @Param('id') id: string,
-    @Body() postUpdateDto: PostUpdateDto,
+    @Body() postUpdateDto: UpdatePostDto,
   ) {
     return this.postService.update(req, Number(id), postUpdateDto);
   }

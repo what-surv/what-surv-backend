@@ -1,4 +1,3 @@
-import { PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
@@ -10,7 +9,7 @@ import {
 } from 'class-validator';
 import { Gender, IsValidGender } from 'src/post/gender';
 
-export class PostCreateDto {
+export class CreatePostDto {
   @IsString()
   @MinLength(3)
   @MaxLength(50)
@@ -43,5 +42,3 @@ export class PostCreateDto {
   @MaxLength(500)
   content!: string;
 }
-
-export class PostUpdateDto extends PartialType(PostCreateDto) {}

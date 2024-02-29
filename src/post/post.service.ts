@@ -6,7 +6,7 @@ import { isNil } from 'src/common/utils';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 
-import { PostCreateDto, PostUpdateDto } from './post.dto';
+import { CreatePostDto, UpdatePostDto } from './dto/create-post.dto';
 
 import { Post } from './post.entity';
 
@@ -18,7 +18,7 @@ export class PostService {
     private readonly userService: UserService,
   ) {}
 
-  async create(req: Request, postCreateDto: PostCreateDto) {
+  async create(req: Request, postCreateDto: CreatePostDto) {
     const jwtUserDto = req.user as JwtUserDto;
     const { provider, providerId } = jwtUserDto;
 
@@ -56,7 +56,7 @@ export class PostService {
     });
   }
 
-  async update(req: Request, id: number, postUpdateDto: PostUpdateDto) {
+  async update(req: Request, id: number, postUpdateDto: UpdatePostDto) {
     const jwtUserDto = req.user as JwtUserDto;
     const { provider, providerId } = jwtUserDto;
 
