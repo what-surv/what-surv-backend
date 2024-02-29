@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
-import { JwtUserDto } from 'src/auth/auth.dto';
+import { JwtUserDto } from 'src/auth/dto/jwt-user.dto';
 import { Public } from 'src/auth/role/public.decorator';
 import { OptionalParseIntPipe } from 'src/user/pipe/optional.parseint.pipe';
 import { UserService } from './user.service';

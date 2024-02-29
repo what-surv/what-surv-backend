@@ -15,12 +15,15 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
+
+import { AuthSignUpDto } from 'src/auth/dto/sign-up.dto';
 import { Public } from 'src/auth/role/public.decorator';
 import { isNil } from 'src/common/utils';
-import { AuthSignUpDto, JwtUserDto, ProfileResponseDto } from './auth.dto';
 import { AuthService } from './auth.service';
 import { CustomJwtGuard } from './custom-jwt.guard';
+import { JwtUserDto } from './dto/jwt-user.dto';
 import { MockSignInDto, signInDtoBodyOptions } from './dto/mock-sign-in.dto';
+import { ProfileResponseDto } from './dto/oauth-user.dto';
 import { Roles } from './role/role';
 import { RequireRoles } from './role/role.decorator';
 
@@ -33,7 +36,7 @@ export class AuthController {
   @Post('/sign-up')
   async signUp(@Req() req: Request, @Body() authSignUpDto: AuthSignUpDto) {
     const jwtUserDto = req.user as JwtUserDto;
-    this.authService.signUp(jwtUserDto, authSignUpDto);
+    return this.authService.signUp(jwtUserDto, authSignUpDto);
   }
 
   @Public()

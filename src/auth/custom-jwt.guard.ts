@@ -9,9 +9,9 @@ import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
+import { JwtUserDto } from 'src/auth/dto/jwt-user.dto';
 import { IS_PUBLIC_KEY } from 'src/auth/role/public.decorator';
 import { isNil } from 'src/common/utils';
-import { JwtUserDto } from './auth.dto';
 
 @Injectable()
 export class CustomJwtGuard implements CanActivate {

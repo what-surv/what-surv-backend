@@ -1,12 +1,13 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'express';
-import { JwtUserDto } from 'src/auth/auth.dto';
+import { JwtUserDto } from 'src/auth/dto/jwt-user.dto';
 import { isNil } from 'src/common/utils';
+import { UpdatePostDto } from 'src/post/dto/update-post.dto';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 
-import { CreatePostDto, UpdatePostDto } from './dto/create-post.dto';
+import { CreatePostDto } from './dto/create-post.dto';
 
 import { Post } from './post.entity';
 

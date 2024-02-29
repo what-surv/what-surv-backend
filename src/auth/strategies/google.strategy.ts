@@ -1,7 +1,7 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-google-oauth20';
 import { isNil } from 'src/common/utils';
-import { OAuthUserDto } from '../auth.dto';
+import { OAuthUserDto } from '../dto/oauth-user.dto';
 
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor() {

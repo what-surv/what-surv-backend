@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
-import { JwtUserDto } from 'src/auth/auth.dto';
+import { JwtUserDto } from 'src/auth/dto/jwt-user.dto';
 import { LikeService } from './like.service';
 
 @ApiTags('Likes')

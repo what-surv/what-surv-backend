@@ -14,7 +14,8 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { Public } from 'src/auth/role/public.decorator';
-import { CreatePostDto, UpdatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from 'src/post/dto/update-post.dto';
+import { CreatePostDto } from './dto/create-post.dto';
 import { PostService } from './post.service';
 
 @ApiTags('Posts')
