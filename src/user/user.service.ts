@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { JwtUserDto } from 'src/auth/auth.dto';
 import { Role, Roles } from 'src/auth/role/role';
+import { Post } from 'src/post/post.entity';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 
@@ -63,5 +65,38 @@ export class UserService {
   async nicknameExists(nickname: string): Promise<boolean> {
     const user = await this.userRepository.findOne({ where: { nickname } });
     return !!user;
+  }
+
+  /* Added feature to read posts written by specific user */
+  async findAllMyPosts({ provider, providerId }: JwtUserDto, page: number = 1) {
+    // pageSize는 프론트
+    const pageSize = 30;
+
+    const qb = this.userRepository.manager
+      .getRepository(Post)
+      .createQueryBuilder('post');
+
+    const [posts, length] = await qb
+      .leftJoin('post.author', 'author')
+      .addSelect(['post', 'author.nickname'])
+      .where('author.provider = :provider', { provider })
+      .andWhere('author.provider_id = :providerId', { providerId })
+      .skip((page - 1) * pageSize)
+      .take(pageSize)
+      .getManyAndCount();
+
+    const total = Math.ceil(length / pageSize);
+
+    const message =
+      total < page || page <= 0
+        ? 'Requested page number is out of range. Please provide a valid page number.'
+        : 'success';
+
+    return {
+      message,
+      posts,
+      page,
+      total,
+    };
   }
 }
