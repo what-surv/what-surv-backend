@@ -4,7 +4,7 @@ import { Public } from 'src/auth/role/public.decorator';
 import { Roles } from 'src/auth/role/role';
 import { RequireRoles } from 'src/auth/role/role.decorator';
 
-@ApiTags('Role Example')
+@ApiTags('(For Tests) Role Example')
 @Controller('role-example')
 export class TempController {
   @ApiOperation({ summary: 'Public access endpoint' })
