@@ -18,10 +18,10 @@ export class User extends CommonEntity {
   role!: Role;
 
   @CreateDateColumn({ type: 'timestamp without time zone' })
-  createdDate?: Date;
+  createdDate!: Date;
 
   @Column({ nullable: true })
-  nickname?: string;
+  nickname!: string;
 
   @Column({ nullable: true })
   gender?: string;
