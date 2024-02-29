@@ -4,6 +4,8 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
+  ParseIntPipe,
   Post,
   Req,
   Res,
@@ -44,7 +46,7 @@ export class AuthController {
   @Get('/callback/google')
   @UseGuards(AuthGuard('google'))
   async callbackGoogle(@Req() req: Request, @Res() res: Response) {
-    this.authService.setTokenToCookie(req, res);
+    return this.authService.setTokenToCookie(req, res);
   }
 
   @Public()
@@ -57,7 +59,7 @@ export class AuthController {
   @Get('/callback/naver')
   @UseGuards(AuthGuard('naver'))
   async callbackNaver(@Req() req: Request, @Res() res: Response) {
-    this.authService.setTokenToCookie(req, res);
+    return this.authService.setTokenToCookie(req, res);
   }
 
   @Public()
@@ -70,7 +72,7 @@ export class AuthController {
   @Get('/callback/kakao')
   @UseGuards(AuthGuard('kakao'))
   async callbackKakao(@Req() req: Request, @Res() res: Response) {
-    this.authService.setTokenToCookie(req, res);
+    return this.authService.setTokenToCookie(req, res);
   }
 
   @Public()
@@ -79,8 +81,12 @@ export class AuthController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Sign In Success' })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
   @HttpCode(HttpStatus.OK)
-  @Post('mock-login')
-  async mockSignIn(@Body() mockSignInDto: MockSignInDto, @Res() res: Response) {
+  @Post('mock-login/:id')
+  async mockSignIn(
+    @Body() mockSignInDto: MockSignInDto,
+    @Param('id', ParseIntPipe) id: number,
+    @Res() res: Response,
+  ) {
     const { username, password } = mockSignInDto;
 
     if (isNil(username) || isNil(password)) {
@@ -90,6 +96,7 @@ export class AuthController {
     const { accessToken } = await this.authService.mockSignIn(
       username,
       password,
+      id,
     );
 
     res.cookie('Authentication', accessToken, { httpOnly: true });
