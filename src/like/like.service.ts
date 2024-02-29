@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { isNil } from 'src/common/utils';
 import { Like } from 'src/like/entities/like.entity';
 import { Repository } from 'typeorm';
 
@@ -26,13 +25,11 @@ export class LikeService {
   }
 
   async isLiked(userId: number, postId: number) {
-    const like = await this.likeRepository.findOne({
+    return this.likeRepository.exists({
       where: {
         post: { id: postId },
         user: { id: userId },
       },
     });
-
-    return !isNil(like);
   }
 }
