@@ -46,8 +46,17 @@ export class PostService {
     return this.postRepository.save(post);
   }
 
-  findAll() {
-    return this.postRepository.find();
+  async find(page: number, limit: number) {
+    const [data, count] = await this.postRepository.findAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
+      relations: ['author'],
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+
+    return { data, count };
   }
 
   findOne(id: number) {
