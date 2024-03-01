@@ -1,7 +1,7 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-naver';
 import { isNil } from 'src/common/utils';
-import { OAuthUserDto } from '../auth.dto';
+import { OAuthUserDto } from '../dto/oauth-user.dto';
 
 export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
   constructor() {

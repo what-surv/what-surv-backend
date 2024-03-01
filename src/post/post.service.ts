@@ -1,12 +1,15 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { PostCreateDto, PostUpdateDto } from './post.dto';
-import { Post } from './post.entity';
 import { Request } from 'express';
-import { JwtUserDto } from 'src/auth/auth.dto';
-import { UserService } from 'src/user/user.service';
+import { JwtUserDto } from 'src/auth/dto/jwt-user.dto';
 import { isNil } from 'src/common/utils';
+import { UpdatePostDto } from 'src/post/dto/update-post.dto';
+import { UserService } from 'src/user/user.service';
+import { Repository } from 'typeorm';
+
+import { CreatePostDto } from './dto/create-post.dto';
+
+import { Post } from './post.entity';
 
 @Injectable()
 export class PostService {
@@ -16,7 +19,7 @@ export class PostService {
     private readonly userService: UserService,
   ) {}
 
-  async create(req: Request, postCreateDto: PostCreateDto) {
+  async create(req: Request, postCreateDto: CreatePostDto) {
     const jwtUserDto = req.user as JwtUserDto;
     const { provider, providerId } = jwtUserDto;
 
@@ -43,8 +46,17 @@ export class PostService {
     return this.postRepository.save(post);
   }
 
-  findAll() {
-    return this.postRepository.find();
+  async find(page: number, limit: number) {
+    const [data, count] = await this.postRepository.findAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
+      relations: ['author'],
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+
+    return { data, count };
   }
 
   findOne(id: number) {
@@ -54,7 +66,7 @@ export class PostService {
     });
   }
 
-  async update(req: Request, id: number, postUpdateDto: PostUpdateDto) {
+  async update(req: Request, id: number, postUpdateDto: UpdatePostDto) {
     const jwtUserDto = req.user as JwtUserDto;
     const { provider, providerId } = jwtUserDto;
 
@@ -98,9 +110,6 @@ export class PostService {
     if (isNil(post)) {
       throw new Error('post not found');
     }
-
-    console.log(post.author);
-    console.log(author);
 
     if (post.author.id !== author.id) {
       throw new UnauthorizedException('Not the owner of Post');

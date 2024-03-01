@@ -1,10 +1,10 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Public } from 'src/auth/role/public.decorator';
 import { Roles } from 'src/auth/role/role';
 import { RequireRoles } from 'src/auth/role/role.decorator';
-import { Public } from 'src/common/utils';
 
-@ApiTags('Role Example')
+@ApiTags('(For Tests) Role Example')
 @Controller('role-example')
 export class TempController {
   @ApiOperation({ summary: 'Public access endpoint' })

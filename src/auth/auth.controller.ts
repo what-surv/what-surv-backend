@@ -4,6 +4,8 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
+  ParseIntPipe,
   Post,
   Req,
   Res,
@@ -13,11 +15,15 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-import { Public, isNil } from 'src/common/utils';
-import { AuthSignUpDto, JwtUserDto, ProfileResponseDto } from './auth.dto';
+
+import { AuthSignUpDto } from 'src/auth/dto/sign-up.dto';
+import { Public } from 'src/auth/role/public.decorator';
+import { isNil } from 'src/common/utils';
 import { AuthService } from './auth.service';
 import { CustomJwtGuard } from './custom-jwt.guard';
+import { JwtUserDto } from './dto/jwt-user.dto';
 import { MockSignInDto, signInDtoBodyOptions } from './dto/mock-sign-in.dto';
+import { ProfileResponseDto } from './dto/oauth-user.dto';
 import { Roles } from './role/role';
 import { RequireRoles } from './role/role.decorator';
 
@@ -30,7 +36,7 @@ export class AuthController {
   @Post('/sign-up')
   async signUp(@Req() req: Request, @Body() authSignUpDto: AuthSignUpDto) {
     const jwtUserDto = req.user as JwtUserDto;
-    this.authService.signUp(jwtUserDto, authSignUpDto);
+    return this.authService.signUp(jwtUserDto, authSignUpDto);
   }
 
   @Public()
@@ -43,7 +49,7 @@ export class AuthController {
   @Get('/callback/google')
   @UseGuards(AuthGuard('google'))
   async callbackGoogle(@Req() req: Request, @Res() res: Response) {
-    this.authService.setTokenToCookie(req, res);
+    return this.authService.setTokenToCookie(req, res);
   }
 
   @Public()
@@ -56,7 +62,7 @@ export class AuthController {
   @Get('/callback/naver')
   @UseGuards(AuthGuard('naver'))
   async callbackNaver(@Req() req: Request, @Res() res: Response) {
-    this.authService.setTokenToCookie(req, res);
+    return this.authService.setTokenToCookie(req, res);
   }
 
   @Public()
@@ -69,7 +75,7 @@ export class AuthController {
   @Get('/callback/kakao')
   @UseGuards(AuthGuard('kakao'))
   async callbackKakao(@Req() req: Request, @Res() res: Response) {
-    this.authService.setTokenToCookie(req, res);
+    return this.authService.setTokenToCookie(req, res);
   }
 
   @Public()
@@ -78,8 +84,12 @@ export class AuthController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Sign In Success' })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
   @HttpCode(HttpStatus.OK)
-  @Post('mock-login')
-  async mockSignIn(@Body() mockSignInDto: MockSignInDto, @Res() res: Response) {
+  @Post('mock-login/:id')
+  async mockSignIn(
+    @Body() mockSignInDto: MockSignInDto,
+    @Param('id', ParseIntPipe) id: number,
+    @Res() res: Response,
+  ) {
     const { username, password } = mockSignInDto;
 
     if (isNil(username) || isNil(password)) {
@@ -89,6 +99,7 @@ export class AuthController {
     const { accessToken } = await this.authService.mockSignIn(
       username,
       password,
+      id,
     );
 
     res.cookie('Authentication', accessToken, { httpOnly: true });

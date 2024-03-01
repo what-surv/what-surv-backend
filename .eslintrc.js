@@ -30,6 +30,5 @@ module.exports = {
     'import/prefer-default-export': 'off',
     'import/no-default-export': 'error',
     'class-methods-use-this': 'off',
-    'max-classes-per-file': 'off',
   },
 };

@@ -8,6 +8,8 @@ import { TypeormConfig } from './config/typeorm.config';
 import { PostModule } from './post/post.module';
 import { RoleExampleModule } from './role-example/role-example.module';
 import { UserModule } from './user/user.module';
+import { CommentModule } from './comment/comment.module';
+import { LikeModule } from './like/like.module';
 
 const envFilePath =
   process.env.NODE_ENV === 'production' ? '.env' : '.env.development';
@@ -25,6 +27,8 @@ const envFilePath =
     UserModule,
     RoleExampleModule,
     PostModule,
+    CommentModule,
+    LikeModule,
   ],
   controllers: [],
   providers: [validationPipeProvider],

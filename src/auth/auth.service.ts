@@ -2,10 +2,12 @@ import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Request, Response } from 'express';
+import { JwtUserDto } from 'src/auth/dto/jwt-user.dto';
+
+import { AuthSignUpDto } from 'src/auth/dto/sign-up.dto';
 import { isNil } from 'src/common/utils';
 import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
-import { AuthSignUpDto, JwtUserDto } from './auth.dto';
 import { Roles } from './role/role';
 
 @Injectable()
@@ -39,7 +41,7 @@ export class AuthService {
     user.job = job; // TODO: is it necessary?
     // TODO: user phone?
 
-    this.userService.save(user);
+    return this.userService.save(user);
   }
 
   async signIn(provider: string, providerId: string) {
@@ -67,7 +69,7 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
-    const clientUrl = await this.configService.get<string>('CLIENT_URL');
+    const clientUrl = this.configService.get<string>('CLIENT_URL');
 
     const { provider, providerId, email } = req.user as JwtUserDto;
 
@@ -77,7 +79,8 @@ export class AuthService {
     );
 
     const jwtUser: JwtUserDto = {
-      nickname: user?.nickname || 'new user',
+      id: user?.id ?? -1,
+      nickname: user?.nickname ?? 'new user',
       provider,
       providerId,
       email,
@@ -97,19 +100,22 @@ export class AuthService {
   async mockSignIn(
     username: string,
     pass: string,
+    id: number,
   ): Promise<{ accessToken: string }> {
-    const user = await this.userService.findOneMockUser(username);
-
-    if (isNil(user) || user.password !== pass) {
+    const user = await this.userService.findById(id);
+    if (isNil(user)) {
       throw new UnauthorizedException();
     }
 
+    const { providerId, provider, nickname, email, role }: JwtUserDto = user;
+
     const payload: JwtUserDto = {
-      nickname: user.username,
-      provider: 'mock',
-      providerId: '123412341234',
-      email: 'mock@mock.com',
-      role: user.role,
+      id,
+      provider,
+      providerId,
+      nickname,
+      email,
+      role,
     };
     return {
       accessToken: await this.jwtService.signAsync(payload),

@@ -1,4 +1,4 @@
-import { PartialType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
@@ -10,38 +10,45 @@ import {
 } from 'class-validator';
 import { Gender, IsValidGender } from 'src/post/gender';
 
-export class PostCreateDto {
+export class CreatePostDto {
+  @ApiProperty()
   @IsString()
   @MinLength(3)
   @MaxLength(50)
   title!: string;
 
+  @ApiProperty()
   @Type(() => Date)
   @IsDate()
   endDate!: Date;
 
+  @ApiProperty()
   @IsValidGender()
   gender!: Gender;
 
+  @ApiProperty()
   @IsArray()
   @IsString({ each: true })
   ages!: string[];
 
+  @ApiProperty()
   @IsString()
   researchType!: string;
 
+  @ApiProperty()
   @IsUrl()
   url!: string;
 
+  @ApiProperty()
   @IsString()
   procedure!: string;
 
+  @ApiProperty()
   @IsString()
   duration!: string;
 
+  @ApiProperty()
   @IsString()
   @MaxLength(500)
   content!: string;
 }
-
-export class PostUpdateDto extends PartialType(PostCreateDto) {}

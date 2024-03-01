@@ -1,21 +1,5 @@
 import { IsNotEmpty, IsString } from 'class-validator';
-import { Role } from './role/role';
-
-export class OAuthUserDto {
-  constructor(
-    readonly provider: string,
-    readonly providerId: string,
-    readonly email: string,
-  ) {}
-}
-
-export interface JwtUserDto {
-  nickname: string;
-  role: Role;
-  provider: string;
-  providerId: string;
-  email: string;
-}
+import { Role } from 'src/auth/role/role';
 
 export interface SignUpDto {
   nickname: string;
@@ -46,9 +30,4 @@ export class AuthSignUpDto implements SignUpDto {
   public role?: Role;
 
   public birthDate?: Date;
-}
-
-export interface ProfileResponseDto {
-  nickname: string;
-  email: string;
 }

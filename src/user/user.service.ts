@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { JwtUserDto } from 'src/auth/auth.dto';
+import { JwtUserDto } from 'src/auth/dto/jwt-user.dto';
 import { Role, Roles } from 'src/auth/role/role';
 import { Post } from 'src/post/post.entity';
 import { Repository } from 'typeorm';
@@ -98,5 +98,9 @@ export class UserService {
       page,
       total,
     };
+  }
+
+  async findById(id: number) {
+    return this.userRepository.findOne({ where: { id } });
   }
 }
