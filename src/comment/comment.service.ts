@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateCommentDto } from './dto/create-comment.dto';
@@ -21,43 +21,50 @@ export class CommentService {
   }
 
   async create(
+    createCommentDto: CreateCommentDto,
     userId: number,
     postId: number,
-    createCommentDto: CreateCommentDto,
   ) {
     return this.commentRepository.save({
-      ...createCommentDto,
-      post: { id: postId },
+      createCommentDto,
       user: { id: userId },
+      post: { id: postId },
     });
   }
 
   async update(
-    userId: number,
-    postId: number,
-    commentId: number,
     updateCommentDto: UpdateCommentDto,
+    userId: number,
+    commentId: number,
   ) {
-    return this.commentRepository.update(
-      {
-        id: commentId,
-        post: { id: postId },
-        user: { id: userId },
-      },
-      {
-        id: commentId,
-        post: { id: postId },
-        user: { id: userId },
-        ...updateCommentDto,
-      },
-    );
-  }
-
-  async remove(userId: number, postId: number, commentId: number) {
-    return this.commentRepository.delete({
+    const comment = await this.commentRepository.findOneBy({
       id: commentId,
-      post: { id: postId },
       user: { id: userId },
     });
+
+    if (!comment) {
+      throw new NotFoundException('Comment not found');
+    }
+
+    if (updateCommentDto.content) {
+      comment.content = updateCommentDto.content;
+    }
+
+    return this.commentRepository.save(comment);
+  }
+
+  async remove(userId: number, commentId: number) {
+    const comment = await this.commentRepository.findOneBy({
+      id: commentId,
+      user: { id: userId },
+    });
+
+    if (!comment) {
+      throw new NotFoundException('Comment not found');
+    }
+
+    comment.content = 'This comment has been removed';
+
+    return this.commentRepository.save(comment);
   }
 }

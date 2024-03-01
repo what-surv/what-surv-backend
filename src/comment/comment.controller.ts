@@ -19,7 +19,7 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 
 @ApiTags('Comments')
 @Controller('/posts/:postId/comments')
-export class CommentController {
+export class PostCommentController {
   constructor(private readonly commentService: CommentService) {}
 
   @Public()
@@ -35,7 +35,8 @@ export class CommentController {
     @Body() createCommentDto: CreateCommentDto,
   ) {
     const jwtUserDto = req.user as JwtUserDto;
-    return this.commentService.create(jwtUserDto.id, postId, createCommentDto);
+
+    return this.commentService.create(createCommentDto, jwtUserDto.id, postId);
   }
 
   @Put(':id')
@@ -46,12 +47,7 @@ export class CommentController {
     @Body() updateCommentDto: UpdateCommentDto,
   ) {
     const jwtUserDto = req.user as JwtUserDto;
-    return this.commentService.update(
-      jwtUserDto.id,
-      postId,
-      id,
-      updateCommentDto,
-    );
+    return this.commentService.update(updateCommentDto, id, jwtUserDto.id);
   }
 
   @Delete(':id')
@@ -62,6 +58,6 @@ export class CommentController {
   ) {
     const jwtUserDto = req.user as JwtUserDto;
 
-    return this.commentService.remove(jwtUserDto.id, postId, id);
+    return this.commentService.remove(id, jwtUserDto.id);
   }
 }
