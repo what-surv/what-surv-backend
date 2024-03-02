@@ -40,7 +40,11 @@ export class PostController {
   @Public()
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.postService.findOne(id);
+    const post = this.postService.findOne(id);
+    this.postService.incrementViewCount(id).catch((error) => {
+      throw error;
+    });
+    return post;
   }
 
   @Patch(':id')
