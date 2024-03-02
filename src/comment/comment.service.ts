@@ -26,7 +26,8 @@ export class CommentService {
     postId: number,
   ) {
     return this.commentRepository.save({
-      createCommentDto,
+      /* 스프레드 적용했습니다. */
+      ...createCommentDto,
       user: { id: userId },
       post: { id: postId },
     });
