@@ -9,7 +9,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { JwtUserDto } from 'src/auth/dto/jwt-user.dto';
 import { Public } from 'src/auth/role/public.decorator';
-import { OptionalParseIntPipe } from 'src/user/pipe/optional.parseint.pipe';
+import { OptionalParseIntPipe } from 'src/common/pipe/optional.parseint.pipe';
 import { UserService } from './user.service';
 
 @ApiTags('Users')
@@ -31,6 +31,8 @@ export class UserController {
     @Req() req: Request,
     @Query('page', OptionalParseIntPipe)
     page: number,
+    @Query('limit', OptionalParseIntPipe.defaultValue(30))
+    limit: number,
   ) {
     const user = req.user as JwtUserDto;
 
