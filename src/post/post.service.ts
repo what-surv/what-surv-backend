@@ -117,4 +117,8 @@ export class PostService {
 
     return this.postRepository.delete(id);
   }
+
+  async incrementViewCount(id: number) {
+    return this.postRepository.increment({ id }, 'viewCount', 1);
+  }
 }

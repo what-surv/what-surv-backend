@@ -32,6 +32,9 @@ export class Post extends CommonEntity {
   @Column({ type: 'text' })
   content!: string;
 
+  @Column({ type: 'int', default: 0 })
+  viewCount!: number;
+
   @ManyToOne(() => User)
   author!: User;
 }
