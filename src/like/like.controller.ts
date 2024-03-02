@@ -17,6 +17,18 @@ import { LikeService } from './like.service';
 export class LikeController {
   constructor(private readonly likeService: LikeService) {}
 
+  @Get()
+  async isLiked(
+    @Req() req: Request,
+    @Param('postId', ParseIntPipe) postId: number,
+  ) {
+    const jwtUserDto = req.user as JwtUserDto;
+    return {
+      isLiked: await this.likeService.isLiked(jwtUserDto.id, postId),
+      postId,
+    };
+  }
+
   @Post()
   async like(
     @Req() req: Request,
@@ -24,15 +36,6 @@ export class LikeController {
   ) {
     const jwtUserDto = req.user as JwtUserDto;
     return this.likeService.like(jwtUserDto.id, postId);
-  }
-
-  @Get()
-  async isLiked(
-    @Req() req: Request,
-    @Param('postId', ParseIntPipe) postId: number,
-  ) {
-    const jwtUserDto = req.user as JwtUserDto;
-    return this.likeService.isLiked(jwtUserDto.id, postId);
   }
 
   @Delete()
