@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { JwtUserDto } from 'src/auth/dto/jwt-user.dto';
 import { Role, Roles } from 'src/auth/role/role';
 import { Post } from 'src/post/post.entity';
 import { Repository } from 'typeorm';
@@ -19,6 +18,18 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
+
+  /* 다른 서비스에서 동일하게 사용할 경우 전역 함수로 변경 가능 */
+  /* 서비스 내 중복 제거 */
+  private pagination(page: number, length: number, pageSize: number) {
+    const total = Math.ceil(length / pageSize);
+    const message =
+      total < page || page <= 0
+        ? 'Requested page number is out of range. Please provide a valid page number.'
+        : 'success';
+
+    return [total, message];
+  }
 
   private readonly mockUsers = [
     {
@@ -68,10 +79,7 @@ export class UserService {
   }
 
   /* Added feature to read posts written by specific user */
-  async findAllMyPosts({ provider, providerId }: JwtUserDto, page: number = 1) {
-    // pageSize는 프론트
-    const pageSize = 30;
-
+  async findAllMyPosts(id: number, page: number, limit: number) {
     const qb = this.userRepository.manager
       .getRepository(Post)
       .createQueryBuilder('post');
@@ -79,22 +87,40 @@ export class UserService {
     const [posts, length] = await qb
       .leftJoin('post.author', 'author')
       .addSelect(['post', 'author.nickname'])
-      .where('author.provider = :provider', { provider })
-      .andWhere('author.provider_id = :providerId', { providerId })
-      .skip((page - 1) * pageSize)
-      .take(pageSize)
+      .where('author.id = :id', { id })
+      .orderBy('post.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit)
       .getManyAndCount();
 
-    const total = Math.ceil(length / pageSize);
-
-    const message =
-      total < page || page <= 0
-        ? 'Requested page number is out of range. Please provide a valid page number.'
-        : 'success';
+    const [total, message] = this.pagination(page, length, limit);
 
     return {
       message,
       posts,
+      page,
+      total,
+    };
+  }
+
+  async findAllMyLikes(id: number, page: number, limit: number) {
+    const qb = this.userRepository.manager
+      .getRepository(Post)
+      .createQueryBuilder('post');
+
+    const [likes, length] = await qb
+      .leftJoin('post.likes', 'like')
+      .where('like.user.id = :id', { id })
+      .orderBy('post.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    const [total, message] = this.pagination(page, length, limit);
+
+    return {
+      message,
+      likes,
       page,
       total,
     };

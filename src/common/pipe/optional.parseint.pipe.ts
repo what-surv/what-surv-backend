@@ -9,7 +9,7 @@ import {
 
 @Injectable()
 export class OptionalParseIntPipe implements PipeTransform {
-  private defaultValue: number | undefined;
+  private defaultValue: number = 1;
 
   static defaultValue(defaultValue: number): OptionalParseIntPipe {
     const optionalParseIntPipe = new OptionalParseIntPipe();
@@ -18,7 +18,7 @@ export class OptionalParseIntPipe implements PipeTransform {
   }
 
   transform(value: string, _metadata: ArgumentMetadata) {
-    const defaultOrValue = this.defaultValue ?? Number((value ?? 1) || 1);
+    const defaultOrValue = Number(value) || this.defaultValue;
 
     const isNaN = Number.isNaN(defaultOrValue);
     const isMinus = defaultOrValue < 0;
