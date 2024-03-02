@@ -5,7 +5,7 @@ import { JwtUserDto } from 'src/auth/dto/jwt-user.dto';
 import { isNil } from 'src/common/utils';
 import { UpdatePostDto } from 'src/post/dto/update-post.dto';
 import { UserService } from 'src/user/user.service';
-import { Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 
 import { CreatePostDto } from './dto/create-post.dto';
 
@@ -17,6 +17,7 @@ export class PostService {
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
     private readonly userService: UserService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async create(req: Request, postCreateDto: CreatePostDto) {
@@ -46,7 +47,43 @@ export class PostService {
     return this.postRepository.save(post);
   }
 
-  async find(page: number, limit: number) {
+  /**
+   * Retrieves a paginated list of the most recent posts, including information about whether each post has been liked by a specific user.
+   *
+   * @param page The current page number for pagination. The first page is 1.
+   * @param limit The number of posts to return per page. Helps in controlling the size of data returned.
+   * @param userId The ID of the user for whom the 'like' status of each post is being checked. This ID is used to determine if the user has liked each post.
+   */
+  async findRecentWithLikes(page: number, limit: number, userId: number) {
+    const [data, count] = await this.postRepository.findAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+
+    const postIds = data.map((post) => post.id);
+
+    const userLikes = await this.dataSource.getRepository('like').find({
+      where: {
+        post: { id: In(postIds) },
+        user: { id: userId },
+      },
+      relations: ['post'],
+    });
+
+    const likedPostIds = new Set(userLikes.map((like) => like.post.id));
+
+    const postsWithLikes = data.map((post) => ({
+      ...post,
+      isLiked: likedPostIds.has(post.id),
+    }));
+
+    return { data: postsWithLikes, count };
+  }
+
+  async findRecent(page: number, limit: number) {
     const [data, count] = await this.postRepository.findAndCount({
       skip: (page - 1) * limit,
       take: limit,

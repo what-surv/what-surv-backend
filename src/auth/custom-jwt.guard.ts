@@ -29,16 +29,16 @@ export class CustomJwtGuard implements CanActivate {
       context.getClass(),
     ]);
 
-    if (isPublic) {
-      return true;
-    }
-
     const request = context.switchToHttp().getRequest();
 
     const token =
       this.extractTokenFromHeader(request) ?? request.cookies?.Authentication;
 
     if (isNil(token)) {
+      if (isPublic) {
+        return true;
+      }
+
       this.logger.debug('Token is missing!');
       throw new UnauthorizedException();
     }
@@ -50,6 +50,10 @@ export class CustomJwtGuard implements CanActivate {
 
       request.user = payload;
     } catch (e) {
+      if (isPublic) {
+        return true;
+      }
+
       this.logger.debug('Token is invalid!');
       this.logger.debug(e);
 

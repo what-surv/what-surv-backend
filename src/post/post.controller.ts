@@ -14,7 +14,9 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
+import { JwtUserDto } from 'src/auth/dto/jwt-user.dto';
 import { Public } from 'src/auth/role/public.decorator';
+import { isNil } from 'src/common/utils';
 import { UpdatePostDto } from 'src/post/dto/update-post.dto';
 import { CreatePostDto } from './dto/create-post.dto';
 import { PostService } from './post.service';
@@ -32,9 +34,20 @@ export class PostController {
 
   @Public()
   @Get()
-  find(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
+  findRecent(
+    @Req() req: Request,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
     const maxLimit = limit > 30 ? 30 : limit;
-    return this.postService.find(page, maxLimit);
+
+    if (isNil(req.user)) {
+      return this.postService.findRecent(page, maxLimit);
+    }
+
+    const jwtUserDto = req.user as JwtUserDto;
+    const userId = jwtUserDto?.id ?? undefined;
+    return this.postService.findRecentWithLikes(page, maxLimit, userId);
   }
 
   @Public()
