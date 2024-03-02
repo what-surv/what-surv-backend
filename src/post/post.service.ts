@@ -83,7 +83,7 @@ export class PostService {
     return { data: postsWithLikes, count };
   }
 
-  async find(page: number, limit: number) {
+  async findRecent(page: number, limit: number) {
     const [data, count] = await this.postRepository.findAndCount({
       skip: (page - 1) * limit,
       take: limit,

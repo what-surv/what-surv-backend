@@ -34,7 +34,7 @@ export class PostController {
 
   @Public()
   @Get()
-  find(
+  findRecent(
     @Req() req: Request,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
@@ -42,7 +42,7 @@ export class PostController {
     const maxLimit = limit > 30 ? 30 : limit;
 
     if (isNil(req.user)) {
-      return this.postService.find(page, maxLimit);
+      return this.postService.findRecent(page, maxLimit);
     }
 
     const jwtUserDto = req.user as JwtUserDto;
