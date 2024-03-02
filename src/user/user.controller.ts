@@ -40,6 +40,23 @@ export class UserController {
       throw new UnauthorizedException();
     }
 
-    return this.userService.findAllMyPosts(user, page);
+    return this.userService.findAllMyPosts(user.id, page, limit);
+  }
+
+  @Get('me/likes')
+  findAllMyLikes(
+    @Req() req: Request,
+    @Query('page', OptionalParseIntPipe)
+    page: number,
+    @Query('limit', OptionalParseIntPipe.defaultValue(30))
+    limit: number,
+  ) {
+    const user = req.user as JwtUserDto;
+
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    return this.userService.findAllMyLikes(user.id, page, limit);
   }
 }
