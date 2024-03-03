@@ -55,6 +55,26 @@ export class PostService {
    * @param userId The ID of the user for whom the 'like' status of each post is being checked. This ID is used to determine if the user has liked each post.
    */
   async findRecentWithLikes(page: number, limit: number, userId: number) {
+    /* 아래 코드를 제안 드렸습니다. */
+    // const count = await this.postRepository.count();
+    // const qb = this.postRepository.createQueryBuilder('post');
+    // const data = await qb
+    //   .leftJoin('post.likes', 'like')
+    //   .leftJoin('like.user', 'user')
+    //   .addSelect(
+    //     `CASE
+    //     WHEN "user"."id" = ${userId ?? 0} THEN true
+    //     ELSE false
+    // END`,
+    //     'isLiked',
+    //   )
+    //   .orderBy('post.createdAt', 'DESC')
+    //   .skip((page - 1) * limit)
+    //   .take(limit)
+    //   .getRawMany();
+
+    // return [data, count];
+
     const [data, count] = await this.postRepository.findAndCount({
       skip: (page - 1) * limit,
       take: limit,
