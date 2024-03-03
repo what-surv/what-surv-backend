@@ -5,7 +5,7 @@ import { JwtUserDto } from 'src/auth/dto/jwt-user.dto';
 import { isNil } from 'src/common/utils';
 import { UpdatePostDto } from 'src/post/dto/update-post.dto';
 import { UserService } from 'src/user/user.service';
-import { DataSource, In, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 
 import { CreatePostDto } from './dto/create-post.dto';
 
@@ -55,52 +55,27 @@ export class PostService {
    * @param userId The ID of the user for whom the 'like' status of each post is being checked. This ID is used to determine if the user has liked each post.
    */
   async findRecentWithLikes(page: number, limit: number, userId: number) {
-    /* 아래 코드를 제안 드렸습니다. */
-    // const count = await this.postRepository.count();
-    // const qb = this.postRepository.createQueryBuilder('post');
-    // const data = await qb
-    //   .leftJoin('post.likes', 'like')
-    //   .leftJoin('like.user', 'user')
-    //   .addSelect(
-    //     `CASE
-    //     WHEN "user"."id" = ${userId ?? 0} THEN true
-    //     ELSE false
-    // END`,
-    //     'isLiked',
-    //   )
-    //   .orderBy('post.createdAt', 'DESC')
-    //   .skip((page - 1) * limit)
-    //   .take(limit)
-    //   .getRawMany();
-
-    // return [data, count];
-
-    const [data, count] = await this.postRepository.findAndCount({
-      skip: (page - 1) * limit,
-      take: limit,
-      order: {
-        createdAt: 'DESC',
-      },
-    });
-
-    const postIds = data.map((post) => post.id);
-
-    const userLikes = await this.dataSource.getRepository('like').find({
-      where: {
-        post: { id: In(postIds) },
-        user: { id: userId },
-      },
-      relations: ['post'],
-    });
-
-    const likedPostIds = new Set(userLikes.map((like) => like.post.id));
-
-    const postsWithLikes = data.map((post) => ({
-      ...post,
-      isLiked: likedPostIds.has(post.id),
-    }));
-
-    return { data: postsWithLikes, count };
+    const count = await this.postRepository.count();
+    const qb = this.postRepository.createQueryBuilder('post');
+    const data = await qb
+      .leftJoin('post.likes', 'like')
+      .leftJoin('like.user', 'user')
+      .addSelect((subQuery) => {
+        /* 서브쿼리로 sql injection 문제 보완하였습니다. */
+        return subQuery
+          .select(
+            'CASE WHEN COUNT(like.id) > 0 THEN true ELSE false END',
+            'isLiked',
+          )
+          .from('like', 'like')
+          .where('like.post_id = post.id')
+          .andWhere('like.user_id = :userId', { userId });
+      }, 'isLiked')
+      .orderBy('post.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getRawMany();
+    return [data, count];
   }
 
   async findRecent(page: number, limit: number) {
