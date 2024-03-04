@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { Role } from 'src/auth/role/role';
 
 export interface SignUpDto {
   nickname: string;
@@ -31,8 +30,6 @@ export class AuthSignUpDto implements SignUpDto {
   public advertisingConsent!: boolean;
 
   @ApiProperty()
-  public role?: Role;
-
-  @ApiProperty()
+  @IsOptional()
   public birthDate?: Date;
 }
