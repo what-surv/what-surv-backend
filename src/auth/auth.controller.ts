@@ -111,14 +111,14 @@ export class AuthController {
   @Get('/profile')
   @HttpCode(HttpStatus.OK)
   getProfile(@Req() req: Request): ProfileResponseDto {
-    const { nickname, email } = req.user as JwtUserDto;
-    return { nickname, email };
+    const { id, nickname, email } = req.user as JwtUserDto;
+    return { id, nickname, email };
   }
 
   @RequireRoles(Roles.NotYetSignedUp)
   @Get('/new-user/profile')
   isNotYetSignedUp(@Req() req: Request): ProfileResponseDto {
-    const { nickname, email } = req.user as JwtUserDto;
-    return { nickname, email };
+    const { id, nickname, email } = req.user as JwtUserDto;
+    return { id, nickname, email };
   }
 }
