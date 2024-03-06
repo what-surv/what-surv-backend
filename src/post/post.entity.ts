@@ -2,6 +2,7 @@ import { CommonEntity } from 'src/common/common.entity';
 import { Like } from 'src/like/entities/like.entity';
 import { Gender, Genders } from 'src/post/gender';
 import { User } from 'src/user/user.entity';
+import { Comment } from 'src/comment/entities/comment.entity';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 
 @Entity()
@@ -38,6 +39,9 @@ export class Post extends CommonEntity {
 
   @ManyToOne(() => User)
   author!: User;
+
+  @OneToMany(() => Comment, (comment) => comment.post)
+  comments!: Comment[];
 
   /**
    * 좋아요 누른 글 다대다 관계로 인해 post에서
