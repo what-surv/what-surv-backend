@@ -25,12 +25,13 @@ export class CommentService {
     userId: number,
     postId: number,
   ) {
-    return this.commentRepository.save({
-      /* 스프레드 적용했습니다. */
-      ...createCommentDto,
+    const comment = this.commentRepository.create({
+      content: createCommentDto.content,
+      parent: { id: createCommentDto.parentId },
       user: { id: userId },
       post: { id: postId },
     });
+    return this.commentRepository.save(comment);
   }
 
   async update(
