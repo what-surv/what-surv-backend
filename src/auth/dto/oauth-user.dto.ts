@@ -7,6 +7,7 @@ export class OAuthUserDto {
 }
 
 export interface ProfileResponseDto {
+  id: number;
   nickname: string;
   email: string;
 }

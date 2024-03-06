@@ -17,6 +17,7 @@ export class CommentService {
       where: {
         post: { id: postId },
       },
+      relations: ['user'],
     });
   }
 
