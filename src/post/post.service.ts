@@ -68,6 +68,9 @@ export class PostService {
       .addSelect('author.id', 'authorId')
       .addSelect('COUNT(comment.id)::int', 'commentCount')
       .addSelect('COUNT(like.id)::int', 'likeCount')
+      .addSelect('post.created_at', 'createdAt')
+      .addSelect('post.end_date', 'endDate')
+      .addSelect('post.view_count', 'viewCount')
       .groupBy('post.id')
       .addGroupBy('author.id');
 
