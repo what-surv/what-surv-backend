@@ -5,7 +5,7 @@ import { JwtUserDto } from 'src/auth/dto/jwt-user.dto';
 import { isNil } from 'src/common/utils';
 import { UpdatePostDto } from 'src/post/dto/update-post.dto';
 import { UserService } from 'src/user/user.service';
-import { DataSource, In, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 
 import { CreatePostDto } from './dto/create-post.dto';
 
@@ -47,60 +47,43 @@ export class PostService {
     return this.postRepository.save(post);
   }
 
-  /**
-   * Retrieves a paginated list of the most recent posts, including information about whether each post has been liked by a specific user.
-   *
-   * @param page The current page number for pagination. The first page is 1.
-   * @param limit The number of posts to return per page. Helps in controlling the size of data returned.
-   * @param userId The ID of the user for whom the 'like' status of each post is being checked. This ID is used to determine if the user has liked each post.
-   */
-  async findRecentWithLikes(page: number, limit: number, userId: number) {
-    /* 아래 코드를 제안 드렸습니다. */
-    // const count = await this.postRepository.count();
-    // const qb = this.postRepository.createQueryBuilder('post');
-    // const data = await qb
-    //   .leftJoin('post.likes', 'like')
-    //   .leftJoin('like.user', 'user')
-    //   .addSelect(
-    //     `CASE
-    //     WHEN "user"."id" = ${userId ?? 0} THEN true
-    //     ELSE false
-    // END`,
-    //     'isLiked',
-    //   )
-    //   .orderBy('post.createdAt', 'DESC')
-    //   .skip((page - 1) * limit)
-    //   .take(limit)
-    //   .getRawMany();
+  async findRecentWithAuthorCommentLikes(
+    page: number,
+    limit: number,
+    userId: number,
+  ) {
+    // use query builder
+    const query = this.postRepository
+      .createQueryBuilder('post')
+      .orderBy('post.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .leftJoin('post.author', 'author')
+      .leftJoin('post.comments', 'comment')
+      .leftJoin('post.likes', 'like')
+      .select('post.id', 'postId')
+      .addSelect('post.title', 'title')
+      .addSelect('post.content', 'content')
+      .addSelect('author.nickname', 'authorNickname')
+      .addSelect('author.id', 'authorId')
+      .addSelect('COUNT(comment.id)::int', 'commentCount')
+      .addSelect('COUNT(like.id)::int', 'likeCount')
+      .groupBy('post.id')
+      .addGroupBy('author.id');
 
-    // return [data, count];
+    if (!isNil(userId)) {
+      query
+        .leftJoin('post.likes', 'userLike', 'userLike.user = :userId', {
+          userId,
+        })
+        .addSelect(
+          'CASE WHEN userLike.id IS NOT NULL THEN true ELSE false END',
+          'isLiked',
+        )
+        .addGroupBy('userLike.id');
+    }
 
-    const [data, count] = await this.postRepository.findAndCount({
-      skip: (page - 1) * limit,
-      take: limit,
-      order: {
-        createdAt: 'DESC',
-      },
-    });
-
-    const postIds = data.map((post) => post.id);
-
-    const userLikes = await this.dataSource.getRepository('like').find({
-      where: {
-        post: { id: In(postIds) },
-        user: { id: userId },
-      },
-      relations: ['post'],
-    });
-
-    const likedPostIds = new Set(userLikes.map((like) => like.post.id));
-
-    const postsWithLikes = data.map((post) => ({
-      ...post,
-      isLiked: likedPostIds.has(post.id),
-    }));
-
-    return { data: postsWithLikes, count };
+    return query.getRawMany();
   }
 
   async findRecent(page: number, limit: number) {
