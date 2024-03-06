@@ -10,7 +10,7 @@ export class Comment {
   @Column()
   content!: string;
 
-  @ManyToOne(() => Post)
+  @ManyToOne(() => Post, (post) => post.comments)
   post!: Post;
 
   @ManyToOne(() => Comment, { nullable: true })
