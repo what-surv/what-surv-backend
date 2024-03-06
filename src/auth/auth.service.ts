@@ -28,7 +28,7 @@ export class AuthService {
       throw new UnauthorizedException('User Already Registered');
     }
 
-    const { nickname, gender, birthDate, job } = authSignUpDto;
+    const { nickname, gender, birthDate } = authSignUpDto;
 
     const user = new User();
     user.role = Roles.User;
@@ -38,7 +38,6 @@ export class AuthService {
     user.nickname = nickname;
     user.gender = gender;
     user.birthDate = birthDate;
-    user.job = job; // TODO: is it necessary?
     // TODO: user phone?
 
     return this.userService.save(user);

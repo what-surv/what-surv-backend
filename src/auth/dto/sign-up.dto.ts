@@ -1,33 +1,35 @@
-import { IsNotEmpty, IsString } from 'class-validator';
-import { Role } from 'src/auth/role/role';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export interface SignUpDto {
   nickname: string;
-  phone: string;
+  phone?: string;
   gender: string;
   advertisingConsent: boolean;
 }
 
 export class AuthSignUpDto implements SignUpDto {
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   public nickname!: string;
 
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  public phone!: string;
+  @IsOptional()
+  public phone?: string;
 
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   public gender!: string;
 
+  @ApiProperty()
   @IsNotEmpty()
   public advertisingConsent!: boolean;
 
-  @IsString()
-  public job?: string;
-
-  public role?: Role;
-
+  @ApiProperty()
+  @IsOptional()
   public birthDate?: Date;
 }
