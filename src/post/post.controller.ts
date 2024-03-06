@@ -17,7 +17,6 @@ import { Request } from 'express';
 import { JwtUserDto } from 'src/auth/dto/jwt-user.dto';
 import { Public } from 'src/auth/role/public.decorator';
 import { OptionalParseIntPipe } from 'src/common/pipe/optional.parseint.pipe';
-import { isNil } from 'src/common/utils';
 import { UpdatePostDto } from 'src/post/dto/update-post.dto';
 import { CreatePostDto } from './dto/create-post.dto';
 import { PostService } from './post.service';
@@ -26,12 +25,6 @@ import { PostService } from './post.service';
 @Controller('posts')
 export class PostController {
   constructor(private readonly postService: PostService) {}
-
-  @Post()
-  @HttpCode(HttpStatus.CREATED)
-  create(@Req() req: Request, @Body() postCreateDto: CreatePostDto) {
-    return this.postService.create(req, postCreateDto);
-  }
 
   @Public()
   @Get()
@@ -56,13 +49,19 @@ export class PostController {
   ) {
     const maxLimit = limit > 30 ? 30 : limit;
 
-    if (isNil(req.user)) {
-      return this.postService.findRecent(page, maxLimit);
-    }
-
     const jwtUserDto = req.user as JwtUserDto;
     const userId = jwtUserDto?.id ?? undefined;
-    return this.postService.findRecentWithLikes(page, maxLimit, userId);
+    return this.postService.findRecentWithAuthorCommentLikes(
+      page,
+      maxLimit,
+      userId,
+    );
+  }
+
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  create(@Req() req: Request, @Body() postCreateDto: CreatePostDto) {
+    return this.postService.create(req, postCreateDto);
   }
 
   @Public()
