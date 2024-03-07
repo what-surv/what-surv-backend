@@ -52,12 +52,16 @@ export class PostService {
     limit: number,
     userId: number,
   ) {
-    // use query builder
+    const countQuery = this.postRepository
+      .createQueryBuilder('post')
+      .select('COUNT(DISTINCT post.id)', 'count');
+
+    const totalCountResult = await countQuery.getRawOne();
+    const totalPosts = parseInt(totalCountResult.count, 10);
+    const totalPages = Math.ceil(totalPosts / limit);
+
     const query = this.postRepository
       .createQueryBuilder('post')
-      .orderBy('post.createdAt', 'DESC')
-      .skip((page - 1) * limit)
-      .limit(limit)
       .leftJoin('post.author', 'author')
       .leftJoin('post.comments', 'comment')
       .leftJoin('post.likes', 'like')
@@ -86,7 +90,17 @@ export class PostService {
         .addGroupBy('userLike.id');
     }
 
-    return query.getRawMany();
+    query
+      .orderBy('post.createdAt', 'DESC')
+      .offset((page - 1) * limit)
+      .limit(limit);
+
+    return {
+      data: await query.getRawMany(),
+      totalPosts,
+      totalPages,
+      currentPage: page,
+    };
   }
 
   async findRecent(page: number, limit: number) {
