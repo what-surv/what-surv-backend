@@ -1,9 +1,10 @@
 import { Post } from 'src/post/post.entity';
 import { User } from 'src/user/user.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { CommonEntity } from 'src/common/common.entity';
 
 @Entity()
-export class Comment {
+export class Comment extends CommonEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
