@@ -17,7 +17,20 @@ export class CommentService {
       where: {
         post: { id: postId },
       },
-      relations: ['user'],
+      relations: ['user', 'parent'],
+      select: {
+        id: true,
+        content: true,
+        createdAt: true,
+        updatedAt: true,
+        user: {
+          id: true,
+          nickname: true,
+        },
+        parent: {
+          id: true,
+        },
+      },
     });
   }
 
