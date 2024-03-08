@@ -30,18 +30,6 @@ export class PostController {
   @Get()
   findRecent(
     @Req() req: Request,
-    /**
-     * 기존 page 및 limit처럼 인자의 default 값이 적용이 되지 않습니다.
-     * 떄문에 작성하신 부분에서 쿼리스트링 없을 떄 NaN 값을 받아와 예기치않은 에러가
-     * 발생합니다.
-     * 이유는 다음과 같습니다.
-     * @Query 데코레이터 함수 구성을 보면 지정 타입에 따라 값을 교체합니다.
-     * 즉, 자바스크립트가 지원하는 default를 무시하게 되어서
-     * pipe를 통해 transform 하였습니다.
-     * NestJS의 권장사항에 따라 커스텀 파이프 new 연산자를 피하기 위해 static 메서드
-     * 생성하여 default 세팅하도록 했습니다. 기본 값 1입니다.
-     * 이 코멘트는 머지 시 삭제 혹은 간소화 되어야 합니다!
-     */
     @Query('page', OptionalParseIntPipe)
     page: number,
     @Query('limit', OptionalParseIntPipe.defaultValue(10))
