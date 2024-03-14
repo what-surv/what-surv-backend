@@ -43,7 +43,7 @@ export class PostController {
     @Req() req: Request,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe)
     page: number,
-    @Query('limit', new DefaultValuePipe(2), ParseIntPipe)
+    @Query('limit', new DefaultValuePipe(30), ParseIntPipe)
     limit: number,
     @Query('sort') sort: string,
     @Query('gender', OptionalGenderPipe)
