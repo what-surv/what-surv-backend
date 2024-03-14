@@ -121,4 +121,20 @@ export class AuthController {
     const { id, nickname, email } = req.user as JwtUserDto;
     return { id, nickname, email };
   }
+
+  @Get('/logout')
+  @HttpCode(HttpStatus.OK)
+  async logout(@Res() res: Response) {
+    res.clearCookie('Authentication');
+    return { message: 'Logout Success' };
+  }
+
+  @Get('/withdrawal')
+  @HttpCode(HttpStatus.OK)
+  async withdraw(@Req() req: Request, @Res() res: Response) {
+    const jwtUserDto = req.user as JwtUserDto;
+    await this.authService.withdraw(jwtUserDto);
+    res.clearCookie('Authentication');
+    return { message: 'Withdrawal Success' };
+  }
 }

@@ -120,4 +120,17 @@ export class AuthService {
       accessToken: await this.jwtService.signAsync(payload),
     };
   }
+
+  async withdraw(jwtUserDto: JwtUserDto) {
+    const user = await this.userService.findByProviderAndProviderId(
+      jwtUserDto.provider,
+      jwtUserDto.providerId,
+    );
+
+    if (isNil(user)) {
+      throw new UnauthorizedException();
+    }
+
+    await this.userService.remove(user);
+  }
 }
