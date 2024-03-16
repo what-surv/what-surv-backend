@@ -129,11 +129,11 @@ export class AuthController {
     return { message: 'Logout Success' };
   }
 
-  @Get('/withdrawal')
+  @Post('/quit')
   @HttpCode(HttpStatus.OK)
-  async withdraw(@Req() req: Request, @Res() res: Response) {
+  async quit(@Req() req: Request, @Res() res: Response) {
     const jwtUserDto = req.user as JwtUserDto;
-    await this.authService.withdraw(jwtUserDto);
+    await this.authService.quit(jwtUserDto);
     res.clearCookie('Authentication');
     return { message: 'Withdrawal Success' };
   }

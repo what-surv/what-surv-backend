@@ -121,7 +121,7 @@ export class AuthService {
     };
   }
 
-  async withdraw(jwtUserDto: JwtUserDto) {
+  async quit(jwtUserDto: JwtUserDto) {
     const user = await this.userService.findByProviderAndProviderId(
       jwtUserDto.provider,
       jwtUserDto.providerId,
