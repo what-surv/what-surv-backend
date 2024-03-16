@@ -126,15 +126,15 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async logout(@Res() res: Response) {
     res.clearCookie('Authentication');
-    return { message: 'Logout Success' };
+    return res.json({ message: 'Logout Success' });
   }
 
   @Post('/quit')
   @HttpCode(HttpStatus.OK)
   async quit(@Req() req: Request, @Res() res: Response) {
     const jwtUserDto = req.user as JwtUserDto;
-    await this.authService.quit(jwtUserDto);
     res.clearCookie('Authentication');
-    return { message: 'Withdrawal Success' };
+    await this.authService.quit(jwtUserDto);
+    return res.json({ message: 'Quit Success' });
   }
 }
