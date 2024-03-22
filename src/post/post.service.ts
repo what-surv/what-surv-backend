@@ -47,20 +47,25 @@ export class PostService {
     return this.postRepository.save(post);
   }
 
+  async find(
+    page: number,
+    limit: number,
+    userId: number,
+    queryFilter: PostQueryFilter,
+  ) {
+    const posts = await this.postRepository.find({
+      skip: (page - 1) * limit,
+      take: limit,
+      relations: ['author'],
+    });
+  }
+
   async findRecentWithAuthorCommentLikes(
     page: number,
     limit: number,
     userId: number,
     queryFilter: PostQueryFilter,
   ) {
-    const countQuery = this.postRepository
-      .createQueryBuilder('post')
-      .select('COUNT(DISTINCT post.id)', 'count');
-
-    const totalCountResult = await countQuery.getRawOne();
-    const totalPosts = parseInt(totalCountResult.count, 10);
-    const totalPages = Math.ceil(totalPosts / limit);
-
     const query = this.postRepository
       .createQueryBuilder('post')
       .leftJoin('post.author', 'author')
@@ -113,6 +118,9 @@ export class PostService {
       query.orderBy('COUNT(like.id)', 'DESC');
     }
     query.addOrderBy('post.createdAt', 'DESC');
+
+    const totalPosts = await query.getCount();
+    const totalPages = Math.ceil(totalPosts / limit);
 
     query.offset((page - 1) * limit).limit(limit);
 
