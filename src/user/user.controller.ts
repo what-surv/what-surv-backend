@@ -23,6 +23,17 @@ export class UserController {
     return this.userService.nicknameExists(nickname);
   }
 
+  @Get('me')
+  async findMe(@Req() req: Request) {
+    const user = req.user as JwtUserDto;
+
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    return this.userService.findById(user.id);
+  }
+
   /* Added feature to read posts written by specific user */
 
   /* NOTICE: 공개 API라면 Querystring 반영 + Public 데코 추가 필요 */

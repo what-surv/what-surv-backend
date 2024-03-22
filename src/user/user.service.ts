@@ -20,6 +20,7 @@ export class UserService {
   ) {}
 
   /* 다른 서비스에서 동일하게 사용할 경우 전역 함수로 변경 가능 */
+
   /* 서비스 내 중복 제거 */
   private pagination(page: number, length: number, pageSize: number) {
     const total = Math.ceil(length / pageSize);
@@ -128,5 +129,9 @@ export class UserService {
 
   async findById(id: number) {
     return this.userRepository.findOne({ where: { id } });
+  }
+
+  async remove(user: User) {
+    await this.userRepository.softRemove(user);
   }
 }
