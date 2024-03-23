@@ -97,6 +97,30 @@ export class AuthService {
     return res.redirect(`${clientUrl}${redirectPath}`);
   }
 
+  async refresh(refreshToken: string) {
+    const payload: JwtUserDto = await this.jwtService.verifyAsync(
+      refreshToken,
+      {
+        secret: this.configService.get<string>('JWT_SECRET'),
+      },
+    );
+
+    const jwtUser: JwtUserDto = {
+      id: payload.id,
+      nickname: payload.nickname,
+      provider: payload.provider,
+      providerId: payload.providerId,
+      email: payload.email,
+      role: payload.role,
+    };
+
+    const token = this.jwtService.sign(jwtUser, {
+      expiresIn: process.env.JWT_REFRESH_TIME,
+      secret: this.configService.get<string>('JWT_SECRET'),
+    });
+    return token;
+  }
+
   async mockSignIn(
     username: string,
     pass: string,

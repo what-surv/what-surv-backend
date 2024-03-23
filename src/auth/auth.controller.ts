@@ -79,6 +79,16 @@ export class AuthController {
   }
 
   @Public()
+  @ApiOperation({ summary: '토큰 갱신' })
+  @Post('refresh')
+  async refresh(@Body() body: { refreshToken: string }) {
+    const { refreshToken } = body;
+    const results = await this.authService.refresh(refreshToken);
+
+    return results;
+  }
+
+  @Public()
   @ApiOperation({ summary: 'Mock local sign in' })
   @ApiBody(signInDtoBodyOptions)
   @ApiResponse({ status: HttpStatus.OK, description: 'Sign In Success' })
