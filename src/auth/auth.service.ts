@@ -28,9 +28,10 @@ export class AuthService {
       throw new UnauthorizedException('User Already Registered');
     }
 
-    const { nickname, gender, birthDate } = authSignUpDto;
+    const { job, nickname, gender, birthDate } = authSignUpDto;
 
     const user = new User();
+    user.job = job;
     user.role = Roles.User;
     user.provider = provider;
     user.providerId = providerId;
@@ -119,5 +120,18 @@ export class AuthService {
     return {
       accessToken: await this.jwtService.signAsync(payload),
     };
+  }
+
+  async quit(jwtUserDto: JwtUserDto) {
+    const user = await this.userService.findByProviderAndProviderId(
+      jwtUserDto.provider,
+      jwtUserDto.providerId,
+    );
+
+    if (isNil(user)) {
+      throw new UnauthorizedException();
+    }
+
+    await this.userService.remove(user);
   }
 }

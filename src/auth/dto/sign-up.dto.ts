@@ -23,6 +23,11 @@ export class AuthSignUpDto implements SignUpDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  public job?: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   public gender!: string;
 
   @ApiProperty()

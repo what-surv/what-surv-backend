@@ -8,7 +8,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { Gender, IsValidGender } from 'src/post/gender';
+import { Gender, IsValidGender } from 'src/post/gender/gender';
 
 export class CreatePostDto {
   @ApiProperty()

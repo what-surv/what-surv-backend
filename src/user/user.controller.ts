@@ -54,7 +54,7 @@ export class UserController {
     @Req() req: Request,
     @Query('page', OptionalParseIntPipe)
     page: number,
-    @Query('limit', OptionalParseIntPipe.defaultValue(30))
+    @Query('limit', OptionalParseIntPipe)
     limit: number,
   ) {
     const user = req.user as JwtUserDto;
@@ -71,7 +71,7 @@ export class UserController {
     @Req() req: Request,
     @Query('page', OptionalParseIntPipe)
     page: number,
-    @Query('limit', OptionalParseIntPipe.defaultValue(30))
+    @Query('limit', OptionalParseIntPipe)
     limit: number,
   ) {
     const user = req.user as JwtUserDto;
