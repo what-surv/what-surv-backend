@@ -115,7 +115,7 @@ export class AuthService {
     };
 
     const token = this.jwtService.sign(jwtUser, {
-      // TODO: expiresIn 추가
+      expiresIn: process.env.JWT_REFRESH,
       secret: this.configService.get<string>('JWT_SECRET'),
     });
     return token;
