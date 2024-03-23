@@ -23,7 +23,9 @@ async function bootstrap() {
     },
   });
 
-  morganSetup(app);
+  if (process.env.NODE_ENV === 'development') {
+    morganSetup(app);
+  }
 
   const config = new BaseAPIDocument().initializeOptions();
   const document = SwaggerModule.createDocument(app, config);
@@ -31,4 +33,5 @@ async function bootstrap() {
 
   await app.listen(3000);
 }
+
 bootstrap();

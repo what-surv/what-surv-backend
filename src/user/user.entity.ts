@@ -30,5 +30,8 @@ export class User extends CommonEntity {
   job?: string;
 
   @Column({ nullable: true })
+  areaOfInterest?: string;
+
+  @Column({ nullable: true })
   birthDate?: Date;
 }
