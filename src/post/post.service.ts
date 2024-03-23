@@ -47,19 +47,6 @@ export class PostService {
     return this.postRepository.save(post);
   }
 
-  async find(
-    page: number,
-    limit: number,
-    userId: number,
-    queryFilter: PostQueryFilter,
-  ) {
-    const posts = await this.postRepository.find({
-      skip: (page - 1) * limit,
-      take: limit,
-      relations: ['author'],
-    });
-  }
-
   async findRecentWithAuthorCommentLikes(
     page: number,
     limit: number,
