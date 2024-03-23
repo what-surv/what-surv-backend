@@ -46,6 +46,12 @@ export class PostController {
     );
   }
 
+  @Public()
+  @Get('/popular')
+  findPopular() {
+    return this.postService.findPopular();
+  }
+
   @Post()
   @HttpCode(HttpStatus.CREATED)
   create(@Req() req: Request, @Body() postCreateDto: CreatePostDto) {
