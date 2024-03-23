@@ -115,7 +115,7 @@ export class AuthService {
     };
 
     const token = this.jwtService.sign(jwtUser, {
-      expiresIn: process.env.JWT_REFRESH,
+      expiresIn: process.env.JWT_REFRESH_TIME,
       secret: this.configService.get<string>('JWT_SECRET'),
     });
     return token;
