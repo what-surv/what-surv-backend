@@ -11,6 +11,10 @@ export const Genders = {
 } as const;
 export type Gender = (typeof Genders)[keyof typeof Genders];
 
+export const isGender = (value: any): value is Gender => {
+  return Object.values(Genders).includes(value);
+};
+
 export const IsValidGender =
   (validationOptions?: ValidationOptions) =>
   (object: any, propertyName: string) => {

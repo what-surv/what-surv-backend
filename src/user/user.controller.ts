@@ -1,6 +1,8 @@
 import {
+  Body,
   Controller,
   Get,
+  Patch,
   Query,
   Req,
   UnauthorizedException,
@@ -11,6 +13,8 @@ import { JwtUserDto } from 'src/auth/dto/jwt-user.dto';
 import { Public } from 'src/auth/role/public.decorator';
 import { OptionalParseIntPipe } from 'src/common/pipe/optional.parseint.pipe';
 import { UserService } from './user.service';
+import { GetAuthUser } from 'src/common/decorators/get-auth-user.decorator';
+import { UpdateUserDto } from 'src/user/dto/update-user.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -34,6 +38,14 @@ export class UserController {
     return this.userService.findById(user.id);
   }
 
+  @Patch('me')
+  async updateMe(
+    @Body() updateUserDto: UpdateUserDto,
+    @GetAuthUser() authUser: JwtUserDto,
+  ) {
+    return this.userService.update(updateUserDto, authUser.id);
+  }
+
   /* Added feature to read posts written by specific user */
 
   /* NOTICE: 공개 API라면 Querystring 반영 + Public 데코 추가 필요 */
@@ -42,7 +54,7 @@ export class UserController {
     @Req() req: Request,
     @Query('page', OptionalParseIntPipe)
     page: number,
-    @Query('limit', OptionalParseIntPipe.defaultValue(30))
+    @Query('limit', OptionalParseIntPipe)
     limit: number,
   ) {
     const user = req.user as JwtUserDto;
@@ -59,7 +71,7 @@ export class UserController {
     @Req() req: Request,
     @Query('page', OptionalParseIntPipe)
     page: number,
-    @Query('limit', OptionalParseIntPipe.defaultValue(30))
+    @Query('limit', OptionalParseIntPipe)
     limit: number,
   ) {
     const user = req.user as JwtUserDto;

@@ -8,7 +8,7 @@ export class TypeormConfig implements TypeOrmOptionsFactory {
     return {
       type: 'postgres', // TODO: 데이터베이스 종류
       host: process.env.DB_HOST, // TODO: 데이터베이스 서버 호스트
-      port: process.env.DB_PORT, // TODO: 데이터베이스 포트
+      port: parseInt(process.env.DB_PORT ?? '5432', 10), // TODO: 데이터베이스 포트
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME, // TODO: 연결할 데이터베이스 이름
