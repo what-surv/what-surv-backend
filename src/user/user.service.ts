@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Role, Roles } from 'src/auth/role/role';
 import { Post } from 'src/post/post.entity';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { User } from './user.entity';
 
 export type MockUser = {
@@ -75,8 +75,11 @@ export class UserService {
   }
 
   async nicknameExists(nickname: string): Promise<boolean> {
-    const user = await this.userRepository.findOne({ where: { nickname } });
-    return !!user;
+    return this.userRepository.exists({
+      where: {
+        nickname: ILike(nickname),
+      },
+    });
   }
 
   /* Added feature to read posts written by specific user */
