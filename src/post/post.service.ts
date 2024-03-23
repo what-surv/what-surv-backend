@@ -5,8 +5,9 @@ import { JwtUserDto } from 'src/auth/dto/jwt-user.dto';
 import { isNil } from 'src/common/utils';
 import { UpdatePostDto } from 'src/post/dto/update-post.dto';
 import { UserService } from 'src/user/user.service';
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 
+import { PostQueryFilter } from 'src/post/post-query-filter';
 import { CreatePostDto } from './dto/create-post.dto';
 
 import { Post } from './post.entity';
@@ -17,7 +18,6 @@ export class PostService {
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
     private readonly userService: UserService,
-    private readonly dataSource: DataSource,
   ) {}
 
   async create(req: Request, postCreateDto: CreatePostDto) {
@@ -47,19 +47,25 @@ export class PostService {
     return this.postRepository.save(post);
   }
 
+  async find(
+    page: number,
+    limit: number,
+    userId: number,
+    queryFilter: PostQueryFilter,
+  ) {
+    const posts = await this.postRepository.find({
+      skip: (page - 1) * limit,
+      take: limit,
+      relations: ['author'],
+    });
+  }
+
   async findRecentWithAuthorCommentLikes(
     page: number,
     limit: number,
     userId: number,
+    queryFilter: PostQueryFilter,
   ) {
-    const countQuery = this.postRepository
-      .createQueryBuilder('post')
-      .select('COUNT(DISTINCT post.id)', 'count');
-
-    const totalCountResult = await countQuery.getRawOne();
-    const totalPosts = parseInt(totalCountResult.count, 10);
-    const totalPages = Math.ceil(totalPosts / limit);
-
     const query = this.postRepository
       .createQueryBuilder('post')
       .leftJoin('post.author', 'author')
@@ -90,10 +96,33 @@ export class PostService {
         .addGroupBy('userLike.id');
     }
 
-    query
-      .orderBy('post.createdAt', 'DESC')
-      .offset((page - 1) * limit)
-      .limit(limit);
+    const { sort, gender, age, researchType, procedure } = queryFilter;
+
+    if (!isNil(gender)) {
+      query.andWhere('post.gender = :gender', { gender });
+    }
+
+    if (!isNil(age)) {
+      // TODO
+    }
+
+    if (!isNil(researchType)) {
+      query.andWhere('post.researchType = :researchType', { researchType });
+    }
+
+    if (!isNil(procedure)) {
+      query.andWhere('post.procedure = :procedure', { procedure });
+    }
+
+    if (sort === 'popular') {
+      query.orderBy('COUNT(like.id)', 'DESC');
+    }
+    query.addOrderBy('post.createdAt', 'DESC');
+
+    const totalPosts = await query.getCount();
+    const totalPages = Math.ceil(totalPosts / limit);
+
+    query.offset((page - 1) * limit).limit(limit);
 
     return {
       data: await query.getRawMany(),
