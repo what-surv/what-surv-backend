@@ -6,9 +6,7 @@ import { isNil } from 'src/common/utils';
 import { UpdatePostDto } from 'src/post/dto/update-post.dto';
 import { UserService } from 'src/user/user.service';
 
-import { DataSource, MoreThanOrEqual, Repository } from 'typeorm';
-import { Repository } from 'typeorm';
-
+import { MoreThanOrEqual, Repository } from 'typeorm';
 
 import { PostQueryFilter } from 'src/post/post-query-filter';
 import { CreatePostDto } from './dto/create-post.dto';
