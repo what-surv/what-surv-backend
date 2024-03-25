@@ -48,11 +48,15 @@ export class CommentService {
     return this.commentRepository.save(comment);
   }
 
-  async update(
-    updateCommentDto: UpdateCommentDto,
-    userId: number,
-    commentId: number,
-  ) {
+  async update({
+    updateCommentDto,
+    userId,
+    commentId,
+  }: {
+    updateCommentDto: UpdateCommentDto;
+    userId: number;
+    commentId: number;
+  }) {
     const comment = await this.commentRepository.findOneBy({
       id: commentId,
       user: { id: userId },
@@ -69,7 +73,7 @@ export class CommentService {
     return this.commentRepository.save(comment);
   }
 
-  async remove(userId: number, commentId: number) {
+  async remove({ commentId, userId }: { commentId: number; userId: number }) {
     const comment = await this.commentRepository.findOneBy({
       id: commentId,
       user: { id: userId },

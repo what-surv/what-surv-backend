@@ -47,7 +47,11 @@ export class PostCommentController {
     @Body() updateCommentDto: UpdateCommentDto,
   ) {
     const jwtUserDto = req.user as JwtUserDto;
-    return this.commentService.update(updateCommentDto, id, jwtUserDto.id);
+    return this.commentService.update({
+      updateCommentDto,
+      commentId: id,
+      userId: jwtUserDto.id,
+    });
   }
 
   @Delete(':id')
@@ -58,6 +62,9 @@ export class PostCommentController {
   ) {
     const jwtUserDto = req.user as JwtUserDto;
 
-    return this.commentService.remove(id, jwtUserDto.id);
+    return this.commentService.remove({
+      commentId: id,
+      userId: jwtUserDto.id,
+    });
   }
 }
