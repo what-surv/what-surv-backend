@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule } from '@nestjs/swagger';
 import * as dotenv from 'dotenv';
 import { AppModule } from './app.module';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { morganSetup } from './common/morgan/morgan.setup';
 import { BaseAPIDocument } from './config/swagger.documents';
 
@@ -26,6 +27,8 @@ async function bootstrap() {
   if (process.env.NODE_ENV === 'development') {
     morganSetup(app);
   }
+
+  app.useGlobalFilters(new AllExceptionsFilter());
 
   const config = new BaseAPIDocument().initializeOptions();
   const document = SwaggerModule.createDocument(app, config);
