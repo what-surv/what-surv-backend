@@ -5,7 +5,8 @@ import { JwtUserDto } from 'src/auth/dto/jwt-user.dto';
 import { isNil } from 'src/common/utils';
 import { UpdatePostDto } from 'src/post/dto/update-post.dto';
 import { UserService } from 'src/user/user.service';
-import { Repository } from 'typeorm';
+
+import { MoreThanOrEqual, Repository } from 'typeorm';
 
 import { PostQueryFilter } from 'src/post/post-query-filter';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -45,6 +46,28 @@ export class PostService {
     post.content = postCreateDto.content;
     post.author = author;
     return this.postRepository.save(post);
+  }
+
+  /** 10 Popular Posts (via viewCount) in the last 7 days
+   */
+  async findPopular() {
+    const today = new Date();
+
+    const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    const [data, count] = await this.postRepository.findAndCount({
+      where: {
+        createdAt: MoreThanOrEqual(lastWeek),
+        viewCount: MoreThanOrEqual(50),
+      },
+      take: 10,
+      relations: ['author'],
+      order: {
+        viewCount: 'DESC',
+      },
+    });
+
+    return { data, count };
   }
 
   async findRecentWithAuthorCommentLikes(
