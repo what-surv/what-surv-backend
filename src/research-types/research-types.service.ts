@@ -4,7 +4,7 @@ import { UpdateResearchTypeDto } from './dto/update-research-type.dto';
 
 @Injectable()
 export class ResearchTypesService {
-  create(createResearchTypeDto: CreateResearchTypeDto) {
+  create(_createResearchTypeDto: CreateResearchTypeDto) {
     return 'This action adds a new researchType';
   }
 
@@ -16,7 +16,7 @@ export class ResearchTypesService {
     return `This action returns a #${id} researchType`;
   }
 
-  update(id: number, updateResearchTypeDto: UpdateResearchTypeDto) {
+  update(id: number, _updateResearchTypeDto: UpdateResearchTypeDto) {
     return `This action updates a #${id} researchType`;
   }
 

@@ -16,8 +16,8 @@ export class ResearchTypesController {
   constructor(private readonly researchTypesService: ResearchTypesService) {}
 
   @Post()
-  create(@Body() _createResearchTypeDto: CreateResearchTypeDto) {
-    return this.researchTypesService.create(_createResearchTypeDto);
+  create(@Body() createResearchTypeDto: CreateResearchTypeDto) {
+    return this.researchTypesService.create(createResearchTypeDto);
   }
 
   @Get()
@@ -33,9 +33,9 @@ export class ResearchTypesController {
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body() _updateRerearchTypeDto: UpdateResearchTypeDto,
+    @Body() updateRerearchTypeDto: UpdateResearchTypeDto,
   ) {
-    return this.researchTypesService.update(+id, _updateRerearchTypeDto);
+    return this.researchTypesService.update(+id, updateRerearchTypeDto);
   }
 
   @Delete(':id')
