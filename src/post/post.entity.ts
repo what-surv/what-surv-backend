@@ -1,12 +1,12 @@
 import { CommonEntity } from 'src/common/common.entity';
 import { Like } from 'src/like/entities/like.entity';
-import { Gender, Genders } from 'src/post/gender/gender';
 import { User } from 'src/user/user.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { IsUrl } from 'class-validator';
 import { ResearchTypeEnum } from 'src/research-types/enums/research-type.enum';
 import { AgeEnum } from 'src/ages/enums/age.enum';
+import { Gender } from 'src/post/gender/gender';
 
 @Entity()
 export class Post extends CommonEntity {
@@ -16,7 +16,7 @@ export class Post extends CommonEntity {
   @Column({ type: 'timestamp' })
   endDate!: Date;
 
-  @Column({ type: 'enum', enum: Genders })
+  @Column({ type: 'enum', enum: Gender })
   gender!: Gender;
 
   @Column({
@@ -59,4 +59,8 @@ export class Post extends CommonEntity {
 
   @OneToMany(() => Like, (like) => like.post)
   likes!: Like[];
+
+  commentCount?: number;
+
+  likeCount?: number;
 }

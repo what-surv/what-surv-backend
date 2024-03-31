@@ -20,12 +20,14 @@ import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { JwtUserDto } from 'src/auth/dto/jwt-user.dto';
 import { Public } from 'src/auth/role/public.decorator';
 import { UpdatePostDto } from 'src/post/dto/update-post.dto';
-import { Gender, Genders } from 'src/post/gender/gender';
 import { PostQueryFilter } from 'src/post/post-query-filter';
 import { PostService } from 'src/post/post.service';
 import { CreatePostDto } from 'src/post/dto/create-post.dto';
 import { GetAuthUser } from 'src/common/decorators/get-auth-user.decorator';
-import { OptionalGenderPipe } from './gender/optional-gender.pipe';
+import { Gender } from 'src/post/gender/gender';
+import { ResearchTypeEnum } from 'src/research-types/enums/research-type.enum';
+import { AgeEnum } from 'src/ages/enums/age.enum';
+import { SortEnum } from 'src/sorts/enums/sort.enum';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -36,22 +38,21 @@ export class PostController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'limit', required: false })
   @ApiQuery({ name: 'sort', required: false })
-  @ApiQuery({ name: 'gender', required: false, enum: Genders })
   @ApiQuery({ name: 'age', required: false })
   @ApiQuery({ name: 'research_type', required: false })
   @ApiQuery({ name: 'procedure', required: false })
-  @Get()
+  @Get('/old-api')
   findRecent(
     @Req() req: Request,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe)
     page: number,
     @Query('limit', new DefaultValuePipe(30), ParseIntPipe)
     limit: number,
-    @Query('sort') sort: string,
-    @Query('gender', OptionalGenderPipe)
+    @Query('sort') sort: SortEnum,
+    @Query('gender')
     gender?: Gender,
-    @Query('age') age?: string,
-    @Query('research_type') researchType?: string,
+    @Query('age') age?: AgeEnum,
+    @Query('research_type') researchType?: ResearchTypeEnum,
     @Query('procedure') procedure?: string,
   ) {
     const maxLimit = limit > 30 ? 30 : limit;
@@ -73,6 +74,29 @@ export class PostController {
       userId,
       queryFilter,
     );
+  }
+
+  @Public()
+  @Get()
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'limit', required: false })
+  findNormal(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe)
+    page: number,
+    @Query('limit', new DefaultValuePipe(30), ParseIntPipe)
+    limit: number,
+    @Query() filter: PostQueryFilter,
+    @Req() req: Request,
+  ) {
+    const user = req.user as JwtUserDto;
+    const userId = user?.id ?? undefined;
+
+    return this.postService.find({
+      page,
+      limit,
+      filter,
+      userId,
+    });
   }
 
   @Public()

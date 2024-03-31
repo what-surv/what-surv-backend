@@ -15,6 +15,8 @@ import { PostQueryFilter } from 'src/post/post-query-filter';
 
 import { CreatePostDto } from 'src/post/dto/create-post.dto';
 import { UpdatePostDto } from 'src/post/dto/update-post.dto';
+import { Gender } from 'src/post/gender/gender';
+import { SortEnum } from 'src/sorts/enums/sort.enum';
 import { Post } from './post.entity';
 
 @Injectable()
@@ -71,6 +73,66 @@ export class PostService {
     });
 
     return { data, count };
+  }
+
+  async find(param: {
+    page: number;
+    limit: number;
+    filter: PostQueryFilter;
+    userId?: number;
+  }) {
+    const { page, limit, filter, userId } = param;
+
+    const { sort, gender, age, researchType, procedure } = filter;
+
+    const qb = Post.createQueryBuilder('post')
+      .leftJoinAndSelect('post.author', 'author')
+      .loadRelationCountAndMap('post.commentCount', 'post.comments')
+      .loadRelationCountAndMap('post.likeCount', 'post.likes');
+
+    if (!isNil(userId)) {
+      qb.leftJoin('post.likes', 'userLike', 'userLike.user = :userId', {
+        userId,
+      });
+    }
+
+    if (!isNil(gender) && gender !== Gender.All) {
+      qb.andWhere('post.gender = :gender', { gender });
+    }
+
+    if (!isNil(age)) {
+      qb.andWhere(':age = ANY(post.ages)', { age });
+    }
+
+    if (!isNil(researchType)) {
+      qb.andWhere(':researchType = ANY(post.researchTypes)', { researchType });
+    }
+
+    if (!isNil(procedure)) {
+      qb.andWhere(':procedure = post.procedure', { procedure });
+    }
+
+    if (!isNil(sort)) {
+      if (sort === SortEnum.Popular) {
+        qb.orderBy('post.likeCount', 'DESC');
+      } else if (sort === SortEnum.Deadline) {
+        qb.orderBy('post.endDate', 'ASC');
+      } else {
+        qb.orderBy('post.createdAt', 'DESC');
+      }
+    }
+
+    qb.offset((page - 1) * limit).limit(limit);
+
+    const totalPosts = await qb.getCount();
+    const totalPages = Math.ceil(totalPosts / limit);
+
+    return {
+      data: await qb.getMany(),
+      totalPosts,
+      totalPages,
+      currentPage: page,
+    };
   }
 
   async findRecentWithAuthorCommentLikes(
@@ -132,7 +194,7 @@ export class PostService {
       query.andWhere('post.procedure = :procedure', { procedure });
     }
 
-    if (sort === 'popular') {
+    if (sort === SortEnum.Popular) {
       query.orderBy('COUNT(like.id)', 'DESC');
     }
     query.addOrderBy('post.createdAt', 'DESC');

@@ -9,9 +9,9 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { Gender, Genders } from 'src/post/gender/gender';
 import { ResearchTypeEnum } from 'src/research-types/enums/research-type.enum';
 import { AgeEnum } from 'src/ages/enums/age.enum';
+import { Gender } from 'src/post/gender/gender';
 
 export class CreatePostDto {
   @ApiProperty({
@@ -32,10 +32,10 @@ export class CreatePostDto {
   endDate!: Date;
 
   @ApiProperty({
-    enum: Genders,
+    enum: Gender,
     enumName: 'Gender',
   })
-  @IsEnum(Genders)
+  @IsEnum(Gender)
   gender!: Gender;
 
   @ApiProperty({
