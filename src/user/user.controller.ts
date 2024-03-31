@@ -12,9 +12,9 @@ import { Request } from 'express';
 import { JwtUserDto } from 'src/auth/dto/jwt-user.dto';
 import { Public } from 'src/auth/role/public.decorator';
 import { OptionalParseIntPipe } from 'src/common/pipe/optional.parseint.pipe';
-import { UserService } from './user.service';
 import { GetAuthUser } from 'src/common/decorators/get-auth-user.decorator';
 import { UpdateUserDto } from 'src/user/dto/update-user.dto';
+import { UserService } from './user.service';
 
 @ApiTags('Users')
 @Controller('users')

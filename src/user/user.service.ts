@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Role, Roles } from 'src/auth/role/role';
 import { Post } from 'src/post/post.entity';
 import { ILike, Repository } from 'typeorm';
-import { User } from './user.entity';
 import { UpdateUserDto } from 'src/user/dto/update-user.dto';
+import { User } from './user.entity';
 
 export type MockUser = {
   userId: number;
@@ -133,18 +133,24 @@ export class UserService {
   }
 
   async update(updateUserDto: UpdateUserDto, id: number) {
-    const nickName = updateUserDto.nickname;
+    const { nickname } = updateUserDto;
 
-    if (nickName) {
-      const user = await this.userRepository.findOne({
-        where: { nickname: nickName },
-      });
-      if (user) {
+    const user = await User.findOne({ where: { id } });
+
+    if (!user) {
+      throw new InternalServerErrorException(`User ${id} not found`);
+    }
+
+    if (nickname && nickname !== user.nickname) {
+      const nicknameExists = await this.nicknameExists(nickname);
+
+      if (nicknameExists) {
         throw new Error('Nickname already exists');
       }
     }
 
-    return this.userRepository.update(id, updateUserDto);
+    await User.update(id, updateUserDto);
+    return User.findOne({ where: { id } });
   }
 
   async remove(user: User) {
