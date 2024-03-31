@@ -14,8 +14,9 @@ import {
   Req,
 } from '@nestjs/common';
 
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
+
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { JwtUserDto } from 'src/auth/dto/jwt-user.dto';
 import { Public } from 'src/auth/role/public.decorator';
 import { UpdatePostDto } from 'src/post/dto/update-post.dto';
@@ -23,6 +24,7 @@ import { Gender, Genders } from 'src/post/gender/gender';
 import { PostQueryFilter } from 'src/post/post-query-filter';
 import { PostService } from 'src/post/post.service';
 import { CreatePostDto } from 'src/post/dto/create-post.dto';
+import { GetAuthUser } from 'src/common/decorators/get-auth-user.decorator';
 import { OptionalGenderPipe } from './gender/optional-gender.pipe';
 
 @ApiTags('Posts')
@@ -81,8 +83,11 @@ export class PostController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Req() req: Request, @Body() postCreateDto: CreatePostDto) {
-    return this.postService.create(req, postCreateDto);
+  create(
+    @Body() createPostDto: CreatePostDto,
+    @GetAuthUser() authUser: JwtUserDto,
+  ) {
+    return this.postService.create({ createPostDto, authUser });
   }
 
   @Public()
@@ -97,11 +102,15 @@ export class PostController {
 
   @Patch(':id')
   update(
-    @Req() req: Request,
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) postId: number,
     @Body() postUpdateDto: UpdatePostDto,
+    @GetAuthUser() authUser: JwtUserDto,
   ) {
-    return this.postService.update(req, Number(id), postUpdateDto);
+    return this.postService.update({
+      userId: authUser.id,
+      postId,
+      postUpdateDto,
+    });
   }
 
   @Delete(':id')

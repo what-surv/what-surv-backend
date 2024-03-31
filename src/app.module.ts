@@ -13,6 +13,7 @@ import { UserModule } from './user/user.module';
 import { CommentModule } from './comment/comment.module';
 import { LikeModule } from './like/like.module';
 import { ImagesModule } from './images/images.module';
+import { ResearchTypesModule } from './research-types/research-types.module';
 
 const envFilePath =
   process.env.NODE_ENV === 'production' ? '.env' : '.env.development';
@@ -37,6 +38,7 @@ const envFilePath =
     CommentModule,
     LikeModule,
     ImagesModule,
+    ResearchTypesModule,
   ],
   controllers: [],
   providers: [validationPipeProvider],
