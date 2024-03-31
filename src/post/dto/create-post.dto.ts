@@ -66,14 +66,4 @@ export class CreatePostDto {
   @IsString()
   @MaxLength(500)
   content!: string;
-
-  @ApiProperty({
-    type: 'array',
-    items: {
-      type: 'string',
-      format: 'binary',
-    },
-    required: false,
-  })
-  files?: Express.Multer.File[];
 }
