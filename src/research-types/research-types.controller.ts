@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ResearchTypesService } from './research-types.service';
 import { CreateResearchTypeDto } from './dto/create-research-type.dto';
 import { UpdateResearchTypeDto } from './dto/update-research-type.dto';
@@ -8,8 +16,8 @@ export class ResearchTypesController {
   constructor(private readonly researchTypesService: ResearchTypesService) {}
 
   @Post()
-  create(@Body() createResearchTypeDto: CreateResearchTypeDto) {
-    return this.researchTypesService.create(createResearchTypeDto);
+  create(@Body() _createResearchTypeDto: CreateResearchTypeDto) {
+    return this.researchTypesService.create(_createResearchTypeDto);
   }
 
   @Get()
@@ -23,8 +31,11 @@ export class ResearchTypesController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateResearchTypeDto: UpdateResearchTypeDto) {
-    return this.researchTypesService.update(+id, updateResearchTypeDto);
+  update(
+    @Param('id') id: string,
+    @Body() _updateRerearchTypeDto: UpdateResearchTypeDto,
+  ) {
+    return this.researchTypesService.update(+id, _updateRerearchTypeDto);
   }
 
   @Delete(':id')
