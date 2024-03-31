@@ -3,7 +3,15 @@ import { Like } from 'src/like/entities/like.entity';
 import { Gender, Genders } from 'src/post/gender/gender';
 import { User } from 'src/user/user.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
-import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
+import { ResearchType } from 'src/research-types/entities/research-type.entity';
 
 @Entity()
 export class Post extends CommonEntity {
@@ -19,8 +27,9 @@ export class Post extends CommonEntity {
   @Column('simple-array')
   ages!: string[];
 
-  @Column({ type: 'varchar', length: 255 })
-  researchType!: string;
+  @ManyToMany(() => ResearchType, (researchType) => researchType.posts)
+  @JoinTable()
+  researchTypes!: ResearchType[];
 
   @Column({ type: 'varchar', length: 255 })
   url!: string;
