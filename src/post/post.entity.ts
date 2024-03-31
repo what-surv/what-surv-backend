@@ -3,15 +3,10 @@ import { Like } from 'src/like/entities/like.entity';
 import { Gender, Genders } from 'src/post/gender/gender';
 import { User } from 'src/user/user.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
-import {
-  Column,
-  Entity,
-  JoinTable,
-  ManyToMany,
-  ManyToOne,
-  OneToMany,
-} from 'typeorm';
-import { ResearchType } from 'src/research-types/entities/research-type.entity';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import { IsUrl } from 'class-validator';
+import { ResearchTypeEnum } from 'src/research-types/enums/research-type.enum';
+import { AgeEnum } from 'src/ages/enums/age.enum';
 
 @Entity()
 export class Post extends CommonEntity {
@@ -24,14 +19,24 @@ export class Post extends CommonEntity {
   @Column({ type: 'enum', enum: Genders })
   gender!: Gender;
 
-  @Column('simple-array')
-  ages!: string[];
+  @Column({
+    type: 'enum',
+    enum: AgeEnum,
+    array: true,
+    default: [],
+  })
+  ages!: AgeEnum[];
 
-  @ManyToMany(() => ResearchType, (researchType) => researchType.posts)
-  @JoinTable()
-  researchTypes!: ResearchType[];
+  @Column({
+    type: 'enum',
+    enum: ResearchTypeEnum,
+    array: true,
+    default: [],
+  })
+  researchTypes!: ResearchTypeEnum[];
 
   @Column({ type: 'varchar', length: 255 })
+  @IsUrl()
   url!: string;
 
   @Column({ type: 'text' })

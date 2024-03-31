@@ -103,18 +103,21 @@ export class PostController {
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) postId: number,
-    @Body() postUpdateDto: UpdatePostDto,
+    @Body() updatePostDto: UpdatePostDto,
     @GetAuthUser() authUser: JwtUserDto,
   ) {
     return this.postService.update({
       userId: authUser.id,
       postId,
-      postUpdateDto,
+      updatePostDto,
     });
   }
 
   @Delete(':id')
-  remove(@Req() req: Request, @Param('id') id: string) {
-    return this.postService.remove(req, Number(id));
+  remove(
+    @Param('id', ParseIntPipe) postId: number,
+    @GetAuthUser() authUser: JwtUserDto,
+  ) {
+    return this.postService.remove({ userId: authUser.id, postId });
   }
 }
