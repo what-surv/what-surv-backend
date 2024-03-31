@@ -3,14 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'express';
 import { JwtUserDto } from 'src/auth/dto/jwt-user.dto';
 import { isNil } from 'src/common/utils';
-import { UpdatePostDto } from 'src/post/dto/update-post.dto';
 import { UserService } from 'src/user/user.service';
 
 import { MoreThanOrEqual, Repository } from 'typeorm';
 
 import { PostQueryFilter } from 'src/post/post-query-filter';
-import { CreatePostDto } from './dto/create-post.dto';
 
+import { CreatePostDto } from 'src/post/dto/create-post.dto';
+import { UpdatePostDto } from 'src/post/dto/update-post.dto';
 import { Post } from './post.entity';
 
 @Injectable()
@@ -21,9 +21,14 @@ export class PostService {
     private readonly userService: UserService,
   ) {}
 
-  async create(req: Request, postCreateDto: CreatePostDto) {
-    const jwtUserDto = req.user as JwtUserDto;
-    const { provider, providerId } = jwtUserDto;
+  async create({
+    createPostDto,
+    authUser,
+  }: {
+    createPostDto: CreatePostDto;
+    authUser: JwtUserDto;
+  }) {
+    const { provider, providerId } = authUser;
 
     const author = await this.userService.findByProviderAndProviderId(
       provider,
@@ -35,15 +40,15 @@ export class PostService {
     }
 
     const post = new Post();
-    post.title = postCreateDto.title;
-    post.endDate = postCreateDto.endDate;
-    post.gender = postCreateDto.gender;
-    post.ages = postCreateDto.ages;
-    post.researchType = postCreateDto.researchType;
-    post.url = postCreateDto.url;
-    post.procedure = postCreateDto.procedure;
-    post.duration = postCreateDto.duration;
-    post.content = postCreateDto.content;
+    post.title = createPostDto.title;
+    post.endDate = createPostDto.endDate;
+    post.gender = createPostDto.gender;
+    post.ages = createPostDto.ages;
+    // post.researchType = createPostDto.researchType;
+    // post.url = createPostDto.url;
+    post.procedure = createPostDto.procedure;
+    post.duration = createPostDto.duration;
+    post.content = createPostDto.content;
     post.author = author;
     return this.postRepository.save(post);
   }
@@ -81,6 +86,7 @@ export class PostService {
       .leftJoin('post.author', 'author')
       .leftJoin('post.comments', 'comment')
       .leftJoin('post.likes', 'like')
+      .leftJoin('post.researchTypes', 'researchType')
       .select('post.id', 'postId')
       .addSelect('post.title', 'title')
       .addSelect('post.content', 'content')
@@ -91,6 +97,10 @@ export class PostService {
       .addSelect('post.created_at', 'createdAt')
       .addSelect('post.end_date', 'endDate')
       .addSelect('post.view_count', 'viewCount')
+      .addSelect(
+        'ARRAY_AGG(DISTINCT researchType.name) FILTER (WHERE researchType.name IS NOT NULL)',
+        'researchTypes',
+      )
       .groupBy('post.id')
       .addGroupBy('author.id');
 
@@ -162,30 +172,27 @@ export class PostService {
     });
   }
 
-  async update(req: Request, id: number, postUpdateDto: UpdatePostDto) {
-    const jwtUserDto = req.user as JwtUserDto;
-    const { provider, providerId } = jwtUserDto;
+  async update(param: {
+    postUpdateDto: UpdatePostDto;
+    postId: number;
+    userId: number;
+  }) {
+    const { postUpdateDto, postId, userId } = param;
 
-    const author = await this.userService.findByProviderAndProviderId(
-      provider,
-      providerId,
-    );
-
-    if (isNil(author)) {
-      throw new Error('User Not Exist');
-    }
-
-    const post = await this.findOne(id);
+    const post = await this.postRepository.findOne({
+      where: { id: postId },
+      relations: ['author'],
+    });
 
     if (isNil(post)) {
       throw new Error('post not found');
     }
 
-    if (post.author.id !== author.id) {
+    if (post.author?.id !== userId) {
       throw new UnauthorizedException('Not the owner of Post');
     }
 
-    return this.postRepository.update(id, postUpdateDto);
+    return this.postRepository.update(postId, postUpdateDto);
   }
 
   async remove(req: Request, id: number) {

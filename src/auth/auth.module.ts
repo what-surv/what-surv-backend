@@ -24,7 +24,7 @@ import { NaverStrategy } from './strategies/naver.strategy';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '600s' },
+        signOptions: { expiresIn: '3600s' },
       }),
     }),
   ],
