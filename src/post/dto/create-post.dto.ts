@@ -1,14 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
-  IsArray,
   IsDate,
+  IsEnum,
+  IsOptional,
   IsString,
   IsUrl,
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { Gender, IsValidGender } from 'src/post/gender/gender';
+import { Gender, Genders } from 'src/post/gender/gender';
 
 export class CreatePostDto {
   @ApiProperty()
@@ -22,33 +23,57 @@ export class CreatePostDto {
   @IsDate()
   endDate!: Date;
 
-  @ApiProperty()
-  @IsValidGender()
+  @ApiProperty({
+    enum: Genders,
+    enumName: 'Gender',
+  })
+  @IsEnum(Genders)
   gender!: Gender;
 
-  @ApiProperty()
-  @IsArray()
+  @ApiProperty({
+    type: [String],
+  })
   @IsString({ each: true })
   ages!: string[];
 
-  @ApiProperty()
-  @IsString()
-  researchType!: string;
+  @ApiProperty({
+    type: [String],
+  })
+  @IsString({ each: true })
+  researchType!: string[];
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsUrl()
-  url!: string;
+  @IsOptional()
+  url?: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: 'string',
+    required: false,
+  })
   @IsString()
+  @IsOptional()
   procedure!: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    required: false,
+  })
+  @IsOptional()
   @IsString()
   duration!: string;
 
-  @ApiProperty()
+  @ApiProperty({})
   @IsString()
   @MaxLength(500)
   content!: string;
+
+  @ApiProperty({
+    type: 'array',
+    items: {
+      type: 'string',
+      format: 'binary',
+    },
+    required: false,
+  })
+  files?: Express.Multer.File[];
 }
