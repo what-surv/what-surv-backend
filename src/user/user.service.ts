@@ -4,6 +4,7 @@ import { Role, Roles } from 'src/auth/role/role';
 import { Post } from 'src/post/post.entity';
 import { ILike, Repository } from 'typeorm';
 import { User } from './user.entity';
+import { UpdateUserDto } from 'src/user/dto/update-user.dto';
 
 export type MockUser = {
   userId: number;
@@ -19,9 +20,6 @@ export class UserService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  /* 다른 서비스에서 동일하게 사용할 경우 전역 함수로 변경 가능 */
-
-  /* 서비스 내 중복 제거 */
   private pagination(page: number, length: number, pageSize: number) {
     const total = Math.ceil(length / pageSize);
     const message =
@@ -132,6 +130,21 @@ export class UserService {
 
   async findById(id: number) {
     return this.userRepository.findOne({ where: { id } });
+  }
+
+  async update(updateUserDto: UpdateUserDto, id: number) {
+    const nickName = updateUserDto.nickname;
+
+    if (nickName) {
+      const user = await this.userRepository.findOne({
+        where: { nickname: nickName },
+      });
+      if (user) {
+        throw new Error('Nickname already exists');
+      }
+    }
+
+    return this.userRepository.update(id, updateUserDto);
   }
 
   async remove(user: User) {
