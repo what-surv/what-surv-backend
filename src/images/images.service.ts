@@ -30,7 +30,7 @@ export class ImagesService {
     return `This action returns a #${id} image`;
   }
 
-  update(id: number, updateImageDto: UpdateImageDto) {
+  update(id: number, _updateImageDto: UpdateImageDto) {
     return `This action updates a #${id} image`;
   }
 
