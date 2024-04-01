@@ -13,7 +13,6 @@ import { UserModule } from './user/user.module';
 import { CommentModule } from './comment/comment.module';
 import { LikeModule } from './like/like.module';
 import { ImagesModule } from './images/images.module';
-import { ResearchTypesModule } from './research-types/research-types.module';
 import { AgesModule } from './ages/ages.module';
 
 const envFilePath =
@@ -39,7 +38,6 @@ const envFilePath =
     CommentModule,
     LikeModule,
     ImagesModule,
-    ResearchTypesModule,
     AgesModule,
   ],
   controllers: [],
