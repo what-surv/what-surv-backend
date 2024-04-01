@@ -35,9 +35,9 @@ export class Post extends CommonEntity {
   })
   researchTypes!: ResearchTypeEnum[];
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   @IsUrl()
-  url!: string;
+  url?: string;
 
   @Column({ type: 'text' })
   procedure!: string;

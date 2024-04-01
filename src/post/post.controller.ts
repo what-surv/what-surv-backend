@@ -61,6 +61,8 @@ export class PostController {
     const userId = jwtUserDto?.id ?? undefined;
 
     const queryFilter: PostQueryFilter = {
+      page,
+      limit,
       sort,
       gender,
       age,
@@ -80,20 +82,11 @@ export class PostController {
   @Get()
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'limit', required: false })
-  findNormal(
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe)
-    page: number,
-    @Query('limit', new DefaultValuePipe(30), ParseIntPipe)
-    limit: number,
-    @Query() filter: PostQueryFilter,
-    @Req() req: Request,
-  ) {
+  findNormal(@Query() filter: PostQueryFilter, @Req() req: Request) {
     const user = req.user as JwtUserDto;
     const userId = user?.id ?? undefined;
 
     return this.postService.find({
-      page,
-      limit,
       filter,
       userId,
     });

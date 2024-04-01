@@ -75,15 +75,10 @@ export class PostService {
     return { data, count };
   }
 
-  async find(param: {
-    page: number;
-    limit: number;
-    filter: PostQueryFilter;
-    userId?: number;
-  }) {
-    const { page, limit, filter, userId } = param;
+  async find(param: { filter: PostQueryFilter; userId?: number }) {
+    const { filter, userId } = param;
 
-    const { sort, gender, age, researchType, procedure } = filter;
+    const { page, limit, sort, gender, age, researchType, procedure } = filter;
 
     const qb = Post.createQueryBuilder('post')
       .leftJoinAndSelect('post.author', 'author')
