@@ -16,7 +16,7 @@ export class Post extends CommonEntity {
   @Column({ type: 'timestamp' })
   endDate!: Date;
 
-  @Column({ type: 'enum', enum: Gender })
+  @Column({ type: 'enum', enum: Gender, nullable: true })
   gender!: Gender;
 
   @Column({
