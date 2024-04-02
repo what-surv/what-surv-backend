@@ -67,18 +67,13 @@ export class UserController {
 
   @Get('me/likes')
   findAllMyLikes(
-    @Req() req: Request,
     @Query('page', OptionalParseIntPipe)
     page: number,
     @Query('limit', OptionalParseIntPipe)
     limit: number,
+    @GetAuthUser() authUser: JwtUserDto,
   ) {
-    const user = req.user as JwtUserDto;
-
-    if (!user) {
-      throw new UnauthorizedException();
-    }
-
-    return this.userService.findAllMyLikes(user.id, page, limit);
+    const userId = authUser.id;
+    return this.userService.findAllMyLikes({ userId, page, limit });
   }
 }
