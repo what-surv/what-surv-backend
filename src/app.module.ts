@@ -14,6 +14,7 @@ import { CommentModule } from './comment/comment.module';
 import { LikeModule } from './like/like.module';
 import { ImagesModule } from './images/images.module';
 import { AgesModule } from './ages/ages.module';
+import { AppController } from './app/app.controller';
 
 const envFilePath =
   process.env.NODE_ENV === 'production' ? '.env' : '.env.development';
@@ -40,7 +41,7 @@ const envFilePath =
     ImagesModule,
     AgesModule,
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [validationPipeProvider],
 })
 export class AppModule implements NestModule {

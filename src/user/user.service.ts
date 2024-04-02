@@ -1,17 +1,9 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Role, Roles } from 'src/auth/role/role';
 import { Post } from 'src/post/post.entity';
 import { ILike, Repository } from 'typeorm';
 import { UpdateUserDto } from 'src/user/dto/update-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
-
-export type MockUser = {
-  userId: number;
-  username: string;
-  password: string;
-  role: Role;
-};
 
 @Injectable()
 export class UserService {
@@ -28,25 +20,6 @@ export class UserService {
         : 'success';
 
     return [total, message];
-  }
-
-  private readonly mockUsers = [
-    {
-      userId: 1,
-      username: 'user',
-      password: 'userpw',
-      role: Roles.User,
-    },
-    {
-      userId: 2,
-      username: 'admin',
-      password: 'adminpw',
-      role: Roles.Admin,
-    },
-  ];
-
-  async findOneMockUser(username: string): Promise<MockUser | undefined> {
-    return this.mockUsers.find((user) => user.username === username);
   }
 
   async findAllUsers(): Promise<User[]> {
@@ -80,51 +53,73 @@ export class UserService {
     });
   }
 
-  /* Added feature to read posts written by specific user */
-  async findAllMyPosts(id: number, page: number, limit: number) {
-    const qb = this.userRepository.manager
-      .getRepository(Post)
-      .createQueryBuilder('post');
-
-    const [posts, length] = await qb
-      .leftJoin('post.author', 'author')
-      .addSelect(['post', 'author.nickname'])
-      .where('author.id = :id', { id })
-      .orderBy('post.createdAt', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit)
-      .getManyAndCount();
-
-    const [total, message] = this.pagination(page, length, limit);
+  async findAllMyPosts2(param: {
+    userId: number;
+    page: number;
+    limit: number;
+  }) {
+    const { userId, page, limit } = param;
+    const [data, count] = await Post.findAndCount({
+      where: { author: { id: userId } },
+      relations: ['author', 'likes', 'comments'],
+      order: { createdAt: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
 
     return {
-      message,
-      posts,
-      page,
-      total,
+      data,
+      count,
     };
   }
 
-  async findAllMyLikes(id: number, page: number, limit: number) {
-    const qb = this.userRepository.manager
-      .getRepository(Post)
-      .createQueryBuilder('post');
+  async findAllMyPosts(param: { userId: number; page: number; limit: number }) {
+    const { userId, page, limit } = param;
+    const qb = Post.createQueryBuilder('post')
+      .leftJoinAndSelect('post.author', 'author', 'author.id = :userId', {
+        userId,
+      })
+      .loadRelationCountAndMap('post.likesCount', 'post.likes')
+      .loadRelationCountAndMap('post.commentsCount', 'post.comments')
+      .leftJoinAndMapOne(
+        'post.userLike',
+        'post.likes',
+        'like',
+        'like.user = :userId',
+        { userId },
+      )
 
-    const [likes, length] = await qb
-      .leftJoin('post.likes', 'like')
-      .where('like.user.id = :id', { id })
-      .orderBy('post.createdAt', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit)
-      .getManyAndCount();
+      .orderBy('post.createdAt', 'DESC');
 
-    const [total, message] = this.pagination(page, length, limit);
+    qb.offset((page - 1) * limit).limit(limit);
+
+    const [posts, totalPostCount] = await qb.getManyAndCount();
 
     return {
-      message,
-      likes,
-      page,
-      total,
+      posts,
+      totalPostCount,
+      totalPageCount: Math.ceil(totalPostCount / limit),
+      currentPage: page,
+    };
+  }
+
+  async findAllMyLikes(param: { userId: number; page: number; limit: number }) {
+    const { userId, page, limit } = param;
+    const qb = Post.createQueryBuilder('post')
+      .innerJoinAndSelect('post.likes', 'like', 'like.user = :userId', {
+        userId,
+      })
+      .orderBy('post.createdAt', 'DESC')
+      .skip((param.page - 1) * param.limit)
+      .take(param.limit);
+
+    const [posts, totalPostCount] = await qb.getManyAndCount();
+
+    return {
+      posts,
+      totalPostCount,
+      totalPageCount: Math.ceil(totalPostCount / limit),
+      currentPage: page,
     };
   }
 

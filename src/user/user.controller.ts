@@ -1,13 +1,15 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Get,
+  ParseIntPipe,
   Patch,
   Query,
   Req,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { JwtUserDto } from 'src/auth/dto/jwt-user.dto';
 import { Public } from 'src/auth/role/public.decorator';
@@ -50,20 +52,17 @@ export class UserController {
 
   /* NOTICE: 공개 API라면 Querystring 반영 + Public 데코 추가 필요 */
   @Get('me/posts')
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'limit', required: false })
   findAllMyPosts(
-    @Req() req: Request,
-    @Query('page', OptionalParseIntPipe)
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe)
     page: number,
-    @Query('limit', OptionalParseIntPipe)
+    @Query('limit', new DefaultValuePipe(5), ParseIntPipe)
     limit: number,
+    @GetAuthUser() authUser: JwtUserDto,
   ) {
-    const user = req.user as JwtUserDto;
-
-    if (!user) {
-      throw new UnauthorizedException();
-    }
-
-    return this.userService.findAllMyPosts(user.id, page, limit);
+    const userId = authUser.id;
+    return this.userService.findAllMyPosts({ userId, page, limit });
   }
 
   @Get('me/likes')
