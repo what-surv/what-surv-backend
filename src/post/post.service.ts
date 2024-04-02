@@ -119,13 +119,12 @@ export class PostService {
 
     qb.offset((page - 1) * limit).limit(limit);
 
-    const totalPosts = await qb.getCount();
-    const totalPages = Math.ceil(totalPosts / limit);
+    const [data, totalPosts] = await qb.getManyAndCount();
 
     return {
-      data: await qb.getMany(),
+      data,
       totalPosts,
-      totalPages,
+      totalPages: Math.ceil(totalPosts / limit),
       currentPage: page,
     };
   }

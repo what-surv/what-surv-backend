@@ -63,4 +63,6 @@ export class Post extends CommonEntity {
   commentCount?: number;
 
   likeCount?: number;
+
+  userLike?: Like;
 }
