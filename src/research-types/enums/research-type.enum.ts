@@ -3,4 +3,5 @@ export enum ResearchTypeEnum {
   interview = 'interview',
   userTest = 'userTest',
   other = 'other',
+  all = 'all',
 }
