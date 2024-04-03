@@ -118,7 +118,10 @@ export class PostService {
     }
 
     if (sort === SortEnum.Popular) {
-      qb.orderBy('post.likeCount', 'DESC');
+      qb.orderBy(
+        '(select count(id) from "like" where "like".post_id = post.id)',
+        'DESC',
+      );
     } else if (sort === SortEnum.Deadline) {
       qb.orderBy('post.endDate', 'ASC');
     } else {
