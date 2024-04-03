@@ -9,60 +9,72 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { Gender, Genders } from 'src/post/gender/gender';
+import { ResearchTypeEnum } from 'src/research-types/enums/research-type.enum';
+import { AgeEnum } from 'src/ages/enums/age.enum';
+import { Gender } from 'src/post/gender/gender';
 
 export class CreatePostDto {
-  @ApiProperty()
+  @ApiProperty({
+    type: 'string',
+    required: true,
+  })
   @IsString()
   @MinLength(3)
   @MaxLength(50)
   title!: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: 'string',
+    format: 'date',
+  })
   @Type(() => Date)
   @IsDate()
   endDate!: Date;
 
   @ApiProperty({
-    enum: Genders,
+    enum: Gender,
     enumName: 'Gender',
   })
-  @IsEnum(Genders)
+  @IsEnum(Gender)
   gender!: Gender;
 
   @ApiProperty({
-    type: [String],
+    enum: AgeEnum,
+    isArray: true,
   })
-  @IsString({ each: true })
-  ages!: string[];
+  @IsEnum(AgeEnum, { each: true })
+  ages!: AgeEnum[];
 
   @ApiProperty({
-    type: [String],
+    enum: ResearchTypeEnum,
+    isArray: true,
   })
-  @IsString({ each: true })
-  researchType!: string[];
-
-  @ApiProperty({ required: false })
-  @IsUrl()
-  @IsOptional()
-  url?: string;
+  @IsEnum(ResearchTypeEnum, { each: true })
+  researchTypes!: ResearchTypeEnum[];
 
   @ApiProperty({
     type: 'string',
-    required: false,
+    example: 'https://www.example.com',
+  })
+  @IsUrl()
+  url!: string;
+
+  @ApiProperty({
+    type: 'string',
   })
   @IsString()
-  @IsOptional()
   procedure!: string;
 
   @ApiProperty({
-    required: false,
+    type: 'string',
   })
   @IsOptional()
   @IsString()
   duration!: string;
 
-  @ApiProperty({})
+  @ApiProperty({
+    type: 'string',
+  })
   @IsString()
   @MaxLength(500)
   content!: string;

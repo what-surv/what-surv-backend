@@ -13,7 +13,7 @@ import { UserModule } from './user/user.module';
 import { CommentModule } from './comment/comment.module';
 import { LikeModule } from './like/like.module';
 import { ImagesModule } from './images/images.module';
-import { ResearchTypesModule } from './research-types/research-types.module';
+import { AppController } from './app/app.controller';
 
 const envFilePath =
   process.env.NODE_ENV === 'production' ? '.env' : '.env.development';
@@ -38,9 +38,8 @@ const envFilePath =
     CommentModule,
     LikeModule,
     ImagesModule,
-    ResearchTypesModule,
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [validationPipeProvider],
 })
 export class AppModule implements NestModule {

@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  DefaultValuePipe,
   Delete,
   Get,
   HttpCode,
@@ -20,66 +19,15 @@ import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { JwtUserDto } from 'src/auth/dto/jwt-user.dto';
 import { Public } from 'src/auth/role/public.decorator';
 import { UpdatePostDto } from 'src/post/dto/update-post.dto';
-import { Gender, Genders } from 'src/post/gender/gender';
 import { PostQueryFilter } from 'src/post/post-query-filter';
 import { PostService } from 'src/post/post.service';
 import { CreatePostDto } from 'src/post/dto/create-post.dto';
 import { GetAuthUser } from 'src/common/decorators/get-auth-user.decorator';
-import { OptionalGenderPipe } from './gender/optional-gender.pipe';
 
 @ApiTags('Posts')
 @Controller('posts')
 export class PostController {
   constructor(private readonly postService: PostService) {}
-
-  @Public()
-  @ApiQuery({ name: 'page', required: false })
-  @ApiQuery({ name: 'limit', required: false })
-  @ApiQuery({ name: 'sort', required: false })
-  @ApiQuery({ name: 'gender', required: false, enum: Genders })
-  @ApiQuery({ name: 'age', required: false })
-  @ApiQuery({ name: 'research_type', required: false })
-  @ApiQuery({ name: 'procedure', required: false })
-  @Get()
-  findRecent(
-    @Req() req: Request,
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe)
-    page: number,
-    @Query('limit', new DefaultValuePipe(30), ParseIntPipe)
-    limit: number,
-    @Query('sort') sort: string,
-    @Query('gender', OptionalGenderPipe)
-    gender?: Gender,
-    @Query('age') age?: string,
-    @Query('research_type') researchType?: string,
-    @Query('procedure') procedure?: string,
-  ) {
-    const maxLimit = limit > 30 ? 30 : limit;
-
-    const jwtUserDto = req.user as JwtUserDto;
-    const userId = jwtUserDto?.id ?? undefined;
-
-    const queryFilter: PostQueryFilter = {
-      sort,
-      gender,
-      age,
-      researchType,
-      procedure,
-    };
-
-    return this.postService.findRecentWithAuthorCommentLikes(
-      page,
-      maxLimit,
-      userId,
-      queryFilter,
-    );
-  }
-
-  @Public()
-  @Get('/popular')
-  findPopular() {
-    return this.postService.findPopular();
-  }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -91,30 +39,57 @@ export class PostController {
   }
 
   @Public()
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    const post = this.postService.findOne(id);
-    this.postService.incrementViewCount(id).catch((error) => {
-      throw error;
+  @Get()
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'limit', required: false })
+  findNormal(@Query() filter: PostQueryFilter, @Req() req: Request) {
+    const user = req.user as JwtUserDto;
+    const userId = user?.id ?? undefined;
+
+    return this.postService.find({
+      filter,
+      userId,
     });
+  }
+
+  @Public()
+  @Get('/popular')
+  findPopular() {
+    return this.postService.findPopular();
+  }
+
+  @Public()
+  @Get(':id')
+  async findOne(
+    @Param('id', ParseIntPipe) postId: number,
+    @Req() req: Request,
+  ) {
+    const user = req.user as JwtUserDto | undefined;
+    const userId = user?.id;
+
+    const post = this.postService.findOne({ postId, userId });
+    await this.postService.incrementViewCount(postId);
     return post;
   }
 
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) postId: number,
-    @Body() postUpdateDto: UpdatePostDto,
+    @Body() updatePostDto: UpdatePostDto,
     @GetAuthUser() authUser: JwtUserDto,
   ) {
     return this.postService.update({
       userId: authUser.id,
       postId,
-      postUpdateDto,
+      updatePostDto,
     });
   }
 
   @Delete(':id')
-  remove(@Req() req: Request, @Param('id') id: string) {
-    return this.postService.remove(req, Number(id));
+  remove(
+    @Param('id', ParseIntPipe) postId: number,
+    @GetAuthUser() authUser: JwtUserDto,
+  ) {
+    return this.postService.remove({ userId: authUser.id, postId });
   }
 }

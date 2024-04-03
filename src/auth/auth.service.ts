@@ -121,11 +121,7 @@ export class AuthService {
     return token;
   }
 
-  async mockSignIn(
-    username: string,
-    pass: string,
-    id: number,
-  ): Promise<{ accessToken: string }> {
+  async mockSignIn(id: number): Promise<{ accessToken: string }> {
     const user = await this.userService.findById(id);
     if (isNil(user)) {
       throw new UnauthorizedException();
