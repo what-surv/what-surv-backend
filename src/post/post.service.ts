@@ -117,14 +117,12 @@ export class PostService {
       qb.andWhere(':procedure = post.procedure', { procedure });
     }
 
-    if (!isNil(sort)) {
-      if (sort === SortEnum.Popular) {
-        qb.orderBy('post.likeCount', 'DESC');
-      } else if (sort === SortEnum.Deadline) {
-        qb.orderBy('post.endDate', 'ASC');
-      } else {
-        qb.orderBy('post.createdAt', 'DESC');
-      }
+    if (sort === SortEnum.Popular) {
+      qb.orderBy('post.likeCount', 'DESC');
+    } else if (sort === SortEnum.Deadline) {
+      qb.orderBy('post.endDate', 'ASC');
+    } else {
+      qb.orderBy('post.createdAt', 'DESC');
     }
 
     qb.offset((page - 1) * limit).limit(limit);
