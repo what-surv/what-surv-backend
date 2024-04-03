@@ -83,8 +83,18 @@ export class PostService {
     const qb = Post.createQueryBuilder('post')
       .leftJoinAndSelect('post.author', 'author')
       .loadRelationCountAndMap('post.commentCount', 'post.comments')
-      .loadRelationCountAndMap('post.likeCount', 'post.likes');
+      .loadRelationCountAndMap('post.likeCount', 'post.likes')
+      .andWhere('post.endDate >= :today', { today: new Date() });
 
+    if (!isNil(userId)) {
+      qb.leftJoinAndMapOne(
+        'post.userLike',
+        'post.likes',
+        'like',
+        'like.user = :userId',
+        { userId },
+      );
+    }
     if (!isNil(userId)) {
       qb.leftJoin('post.likes', 'userLike', 'userLike.user = :userId', {
         userId,
