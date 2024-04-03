@@ -58,11 +58,9 @@ export class PostService {
   async findPopular() {
     const today = new Date();
 
-    const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-
     const [data, count] = await this.postRepository.findAndCount({
       where: {
-        createdAt: MoreThanOrEqual(lastWeek),
+        endDate: MoreThanOrEqual(today),
         viewCount: MoreThanOrEqual(50),
       },
       take: 10,
