@@ -79,8 +79,8 @@ export class UserService {
       .leftJoinAndSelect('post.author', 'author', 'author.id = :userId', {
         userId,
       })
-      .loadRelationCountAndMap('post.likesCount', 'post.likes')
-      .loadRelationCountAndMap('post.commentsCount', 'post.comments')
+      .loadRelationCountAndMap('post.likeCount', 'post.likes')
+      .loadRelationCountAndMap('post.commentCount', 'post.comments')
       .leftJoinAndMapOne(
         'post.userLike',
         'post.likes',
@@ -109,6 +109,8 @@ export class UserService {
       .innerJoinAndSelect('post.likes', 'like', 'like.user = :userId', {
         userId,
       })
+      .loadRelationCountAndMap('post.likeCount', 'post.likes')
+      .loadRelationCountAndMap('post.commentCount', 'post.comments')
       .orderBy('post.createdAt', 'DESC')
       .skip((param.page - 1) * param.limit)
       .take(param.limit);
