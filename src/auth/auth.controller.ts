@@ -79,11 +79,15 @@ export class AuthController {
   @Public()
   @ApiOperation({ summary: '토큰 갱신' })
   @Post('refresh')
-  async refresh(@Body() body: { refreshToken: string }) {
+  async refresh(@Body() body: { refreshToken: string }, res: Response) {
     const { refreshToken } = body;
-    const results = await this.authService.refresh(refreshToken);
+    const newToken = await this.authService.refresh(refreshToken);
 
-    return results;
+    res.cookie('Authentication', newToken, {
+      httpOnly: true,
+      secure: false,
+    });
+    return newToken;
   }
 
   @Public()
