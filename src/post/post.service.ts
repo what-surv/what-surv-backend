@@ -88,15 +88,10 @@ export class PostService {
       qb.leftJoinAndMapOne(
         'post.userLike',
         'post.likes',
-        'like',
-        'like.user = :userId',
+        'userLike',
+        'userLike.user.id = :userId',
         { userId },
       );
-    }
-    if (!isNil(userId)) {
-      qb.leftJoin('post.likes', 'userLike', 'userLike.user = :userId', {
-        userId,
-      });
     }
 
     if (!isNil(gender) && gender !== Gender.All) {
@@ -116,10 +111,7 @@ export class PostService {
     }
 
     if (sort === SortEnum.Popular) {
-      qb.orderBy(
-        '(select count(id) from "like" where "like".post_id = post.id)',
-        'DESC',
-      );
+      qb.orderBy('post.viewCount', 'DESC');
     } else if (sort === SortEnum.Deadline) {
       qb.orderBy('post.endDate', 'ASC');
     } else {
@@ -138,101 +130,26 @@ export class PostService {
     };
   }
 
-  async findRecentWithAuthorCommentLikes(
-    page: number,
-    limit: number,
-    userId: number,
-    queryFilter: PostQueryFilter,
-  ) {
-    const query = this.postRepository
-      .createQueryBuilder('post')
-      .leftJoin('post.author', 'author')
-      .leftJoin('post.comments', 'comment')
-      .leftJoin('post.likes', 'like')
-      .leftJoin('post.researchTypes', 'researchType')
-      .select('post.id', 'postId')
-      .addSelect('post.title', 'title')
-      .addSelect('post.content', 'content')
-      .addSelect('author.nickname', 'authorNickname')
-      .addSelect('author.id', 'authorId')
-      .addSelect('COUNT(comment.id)::int', 'commentCount')
-      .addSelect('COUNT(like.id)::int', 'likeCount')
-      .addSelect('post.created_at', 'createdAt')
-      .addSelect('post.end_date', 'endDate')
-      .addSelect('post.view_count', 'viewCount')
-      .addSelect(
-        'ARRAY_AGG(DISTINCT researchType.name) FILTER (WHERE researchType.name IS NOT NULL)',
-        'researchTypes',
-      )
-      .groupBy('post.id')
-      .addGroupBy('author.id');
+  findOne(param: { postId: number; userId?: number }) {
+    const { postId, userId } = param;
+
+    const qb = Post.createQueryBuilder('post')
+      .leftJoinAndSelect('post.author', 'author')
+      .where('post.id = :postId', { postId })
+      .loadRelationCountAndMap('post.commentCount', 'post.comments')
+      .loadRelationCountAndMap('post.likeCount', 'post.likes');
 
     if (!isNil(userId)) {
-      query
-        .leftJoin('post.likes', 'userLike', 'userLike.user = :userId', {
-          userId,
-        })
-        .addSelect(
-          'CASE WHEN userLike.id IS NOT NULL THEN true ELSE false END',
-          'isLiked',
-        )
-        .addGroupBy('userLike.id');
+      qb.leftJoinAndMapOne(
+        'post.userLike',
+        'post.likes',
+        'userLike',
+        'userLike.user.id = :userId',
+        { userId },
+      );
     }
 
-    const { sort, gender, age, researchType, procedure } = queryFilter;
-
-    if (!isNil(gender)) {
-      query.andWhere('post.gender = :gender', { gender });
-    }
-
-    if (!isNil(age)) {
-      // TODO
-    }
-
-    if (!isNil(researchType)) {
-      query.andWhere('post.researchType = :researchType', { researchType });
-    }
-
-    if (!isNil(procedure)) {
-      query.andWhere('post.procedure = :procedure', { procedure });
-    }
-
-    if (sort === SortEnum.Popular) {
-      query.orderBy('COUNT(like.id)', 'DESC');
-    }
-    query.addOrderBy('post.createdAt', 'DESC');
-
-    const totalPosts = await query.getCount();
-    const totalPages = Math.ceil(totalPosts / limit);
-
-    query.offset((page - 1) * limit).limit(limit);
-
-    return {
-      data: await query.getRawMany(),
-      totalPosts,
-      totalPages,
-      currentPage: page,
-    };
-  }
-
-  async findRecent(page: number, limit: number) {
-    const [data, count] = await this.postRepository.findAndCount({
-      skip: (page - 1) * limit,
-      take: limit,
-      relations: ['author'],
-      order: {
-        createdAt: 'DESC',
-      },
-    });
-
-    return { data, count };
-  }
-
-  findOne(id: number) {
-    return this.postRepository.findOne({
-      where: { id },
-      relations: ['author'],
-    });
+    return qb.getOne();
   }
 
   async update(param: {
