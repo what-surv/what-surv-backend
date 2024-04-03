@@ -14,9 +14,9 @@ $$
             LOOP
                 -- Example logic to alternate gender
                 IF i % 2 = 0 THEN
-                    current_gender := 'Male';
+                    current_gender := 'male';
                 ELSE
-                    current_gender := 'Female';
+                    current_gender := 'female';
                 END IF;
 
                 -- Generate arrays for ages and researchTypes based on iteration
