@@ -109,6 +109,7 @@ export class UserService {
       .innerJoinAndSelect('post.likes', 'like', 'like.user = :userId', {
         userId,
       })
+      .leftJoinAndSelect('post.author', 'author')
       .loadRelationCountAndMap('post.likeCount', 'post.likes')
       .loadRelationCountAndMap('post.commentCount', 'post.comments')
       .orderBy('post.createdAt', 'DESC')
