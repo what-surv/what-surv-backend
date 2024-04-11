@@ -76,7 +76,7 @@ export class UserService {
   async findAllMyPosts(param: { userId: number; page: number; limit: number }) {
     const { userId, page, limit } = param;
     const qb = Post.createQueryBuilder('post')
-      .leftJoinAndSelect('post.author', 'author', 'author.id = :userId', {
+      .innerJoinAndSelect('post.author', 'author', 'author.id = :userId', {
         userId,
       })
       .loadRelationCountAndMap('post.likeCount', 'post.likes')
