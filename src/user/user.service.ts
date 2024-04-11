@@ -106,12 +106,19 @@ export class UserService {
   async findAllMyLikes(param: { userId: number; page: number; limit: number }) {
     const { userId, page, limit } = param;
     const qb = Post.createQueryBuilder('post')
-      .innerJoinAndSelect('post.likes', 'like', 'like.user = :userId', {
+      .innerJoin('post.likes', 'like', 'like.user = :userId', {
         userId,
       })
       .leftJoinAndSelect('post.author', 'author')
       .loadRelationCountAndMap('post.likeCount', 'post.likes')
       .loadRelationCountAndMap('post.commentCount', 'post.comments')
+      .leftJoinAndMapOne(
+        'post.userLike',
+        'post.likes',
+        'userLike',
+        'userLike.user.id = :userId',
+        { userId },
+      )
       .orderBy('post.createdAt', 'DESC')
       .skip((param.page - 1) * param.limit)
       .take(param.limit);
