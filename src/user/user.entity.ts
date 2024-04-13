@@ -34,4 +34,10 @@ export class User extends CommonEntity {
 
   @Column({ nullable: true })
   birthDate?: Date;
+
+  @Column({ nullable: true })
+  phone?: string;
+
+  @Column({ nullable: true })
+  advertisingConsent?: boolean;
 }

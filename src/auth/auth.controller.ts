@@ -21,7 +21,7 @@ import { AuthService } from './auth.service';
 import { CustomJwtGuard } from './custom-jwt.guard';
 import { JwtUserDto } from './dto/jwt-user.dto';
 import { signInDtoBodyOptions } from './dto/mock-sign-in.dto';
-import { ProfileResponseDto } from './dto/oauth-user.dto';
+import { OAuthUserDto, ProfileResponseDto } from './dto/oauth-user.dto';
 import { Roles } from './role/role';
 import { RequireRoles } from './role/role.decorator';
 
@@ -48,6 +48,14 @@ export class AuthController {
   @UseGuards(AuthGuard('google'))
   async callbackGoogle(@Req() req: Request, @Res() res: Response) {
     return this.authService.setTokenToCookie(req, res);
+  }
+
+  @Public()
+  @Post('/mock-signup/issue-token')
+  async mockSignUpToken(@Body() body: OAuthUserDto, @Res() res: Response) {
+    const { token } = await this.authService.issueMockSignUpToken(body);
+    res.cookie('Authentication', token, { httpOnly: true });
+    return res.json({ token });
   }
 
   @Public()

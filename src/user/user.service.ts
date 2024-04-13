@@ -3,6 +3,9 @@ import { Post } from 'src/post/post.entity';
 import { ILike, Repository } from 'typeorm';
 import { UpdateUserDto } from 'src/user/dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Roles } from 'src/auth/role/role';
+import { JwtUserDto } from 'src/auth/dto/jwt-user.dto';
+import { AuthSignUpDto } from 'src/auth/dto/sign-up.dto';
 import { User } from './user.entity';
 
 @Injectable()
@@ -22,27 +25,42 @@ export class UserService {
     return [total, message];
   }
 
-  async findAllUsers(): Promise<User[]> {
-    return this.userRepository.find();
-  }
-
   async findByProviderAndProviderId(provider: string, providerId: string) {
     return this.userRepository.findOne({
       where: { provider, providerId },
     });
   }
 
-  async save(user: User): Promise<User> {
+  async create(param: {
+    jwtUserDto: JwtUserDto;
+    authSignUpDto: AuthSignUpDto;
+    returningUser: User | undefined;
+  }): Promise<User> {
+    const { jwtUserDto, authSignUpDto } = param;
+
+    const { provider, providerId, email } = jwtUserDto;
+    const { nickname, phone, job, gender, birthDate, advertisingConsent } =
+      authSignUpDto;
+
+    const user = param.returningUser ?? new User();
+
+    if (param.returningUser) {
+      user.deletedAt = null as any;
+    }
+
+    user.email = email;
+    user.provider = provider;
+    user.providerId = providerId;
+
+    user.role = Roles.User;
+    user.nickname = nickname;
+    user.gender = gender;
+    user.job = job;
+    user.birthDate = birthDate;
+    user.phone = phone;
+    user.advertisingConsent = advertisingConsent;
+
     return this.userRepository.save(user);
-  }
-
-  async deleteUser(id: number): Promise<void> {
-    await this.userRepository.delete(id);
-  }
-
-  async signUp(user: User): Promise<User> {
-    await this.userRepository.save(user);
-    return user;
   }
 
   async nicknameExists(nickname: string): Promise<boolean> {
@@ -51,26 +69,6 @@ export class UserService {
         nickname: ILike(nickname),
       },
     });
-  }
-
-  async findAllMyPosts2(param: {
-    userId: number;
-    page: number;
-    limit: number;
-  }) {
-    const { userId, page, limit } = param;
-    const [data, count] = await Post.findAndCount({
-      where: { author: { id: userId } },
-      relations: ['author', 'likes', 'comments'],
-      order: { createdAt: 'DESC' },
-      skip: (page - 1) * limit,
-      take: limit,
-    });
-
-    return {
-      data,
-      count,
-    };
   }
 
   async findAllMyPosts(param: { userId: number; page: number; limit: number }) {
