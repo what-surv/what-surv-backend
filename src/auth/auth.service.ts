@@ -8,6 +8,7 @@ import { AuthSignUpDto } from 'src/auth/dto/sign-up.dto';
 import { isNil } from 'src/common/utils';
 import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
+import { OAuthUserDto } from 'src/auth/dto/oauth-user.dto';
 import { Roles } from './role/role';
 
 @Injectable()
@@ -22,26 +23,32 @@ export class AuthService {
 
   async signUp(jwtUserDto: JwtUserDto, authSignUpDto: AuthSignUpDto) {
     const { provider, providerId, email } = jwtUserDto;
-    if (
-      await this.userService.findByProviderAndProviderId(provider, providerId)
-    ) {
-      throw new UnauthorizedException('User Already Registered');
+
+    const user = await User.findOne({
+      where: { provider, providerId },
+      withDeleted: true,
+    });
+
+    if (!isNil(user)) {
+      if (isNil(user.deletedAt)) {
+        throw new UnauthorizedException(
+          `User already exists: ${provider}, ${providerId}, ${email}`,
+        );
+      }
+
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+      if (user.deletedAt && user.deletedAt > sevenDaysAgo) {
+        throw new UnauthorizedException(
+          `User cannot be re-signed up within 7 days: ${provider}, ${providerId}, ${email}`,
+        );
+      }
     }
 
-    const { job, nickname, gender, birthDate } = authSignUpDto;
-
-    const user = new User();
-    user.job = job;
-    user.role = Roles.User;
-    user.provider = provider;
-    user.providerId = providerId;
-    user.email = email;
-    user.nickname = nickname;
-    user.gender = gender;
-    user.birthDate = birthDate;
-    // TODO: user phone?
-
-    return this.userService.save(user);
+    return this.userService.create({
+      jwtUserDto,
+      authSignUpDto,
+      returningUser: user ?? undefined,
+    });
   }
 
   async signIn(provider: string, providerId: string) {
@@ -64,6 +71,33 @@ export class AuthService {
     };
   }
 
+  async issueMockSignUpToken(userDto: OAuthUserDto) {
+    const { provider, providerId, email } = userDto;
+
+    const user = await User.findOne({
+      where: { provider, providerId },
+    });
+
+    if (!isNil(user)) {
+      throw new UnauthorizedException(
+        `User already exists: ${provider}, ${providerId}, ${email}`,
+      );
+    }
+
+    const jwtUser: JwtUserDto = {
+      id: -1,
+      nickname: 'new user',
+      provider,
+      providerId,
+      email,
+      role: Roles.NotYetSignedUp,
+    };
+
+    const token = await this.jwtService.signAsync(jwtUser);
+
+    return { token };
+  }
+
   async setTokenToCookie(req: Request, res: Response) {
     if (isNil(req.user)) {
       throw new UnauthorizedException();
@@ -71,12 +105,11 @@ export class AuthService {
 
     const clientUrl = this.configService.get<string>('CLIENT_URL');
 
-    const { provider, providerId, email } = req.user as JwtUserDto;
+    const { provider, providerId, email } = req.user as OAuthUserDto;
 
-    const user = await this.userService.findByProviderAndProviderId(
-      provider,
-      providerId,
-    );
+    const user = await User.findOne({
+      where: { provider, providerId },
+    });
 
     const jwtUser: JwtUserDto = {
       id: user?.id ?? -1,
@@ -143,9 +176,12 @@ export class AuthService {
   }
 
   async quit(jwtUserDto: JwtUserDto) {
+    const { provider, providerId } = jwtUserDto;
+    this.logger.log(`provider: ${provider}, providerId: ${providerId}`);
+
     const user = await this.userService.findByProviderAndProviderId(
-      jwtUserDto.provider,
-      jwtUserDto.providerId,
+      provider,
+      providerId,
     );
 
     if (isNil(user)) {
