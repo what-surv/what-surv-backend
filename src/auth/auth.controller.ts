@@ -17,6 +17,7 @@ import { Request, Response } from 'express';
 
 import { AuthSignUpDto } from 'src/auth/dto/sign-up.dto';
 import { Public } from 'src/auth/role/public.decorator';
+import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { CustomJwtGuard } from './custom-jwt.guard';
 import { JwtUserDto } from './dto/jwt-user.dto';
@@ -28,13 +29,32 @@ import { RequireRoles } from './role/role.decorator';
 @ApiTags('Authorization')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   @RequireRoles(Roles.NotYetSignedUp)
   @Post('/sign-up')
-  async signUp(@Req() req: Request, @Body() authSignUpDto: AuthSignUpDto) {
-    const jwtUserDto = req.user as JwtUserDto;
-    return this.authService.signUp(jwtUserDto, authSignUpDto);
+  async signUp(
+    @Req() req: Request,
+    @Body() authSignUpDto: AuthSignUpDto,
+    @Res() res: Response,
+  ) {
+    const newTempUserDto = req.user as JwtUserDto;
+    const user = await this.authService.signUp(newTempUserDto, authSignUpDto);
+    const jwtUser: JwtUserDto = {
+      id: user.id,
+      nickname: user.nickname,
+      provider: user.provider,
+      providerId: user.providerId,
+      email: user.email,
+      role: user.role,
+    };
+
+    const token = await this.jwtService.signAsync(jwtUser);
+    res.cookie('Authentication', token, { httpOnly: true });
+    res.send(user);
   }
 
   @Public()
